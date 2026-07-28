@@ -3,7 +3,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { renameProject } from '../../scripts/rename-plugin.mjs';
+import * as fs from 'node:fs/promises';
+import { deriveMetadata, renameProject, validateMetadata } from '../../scripts/rename-plugin.mjs';
 
 const temporaryRoots = [];
 const metadata = {
@@ -41,6 +42,18 @@ afterEach(async () => {
 });
 
 describe('renameProject', () => {
+  it('derives all dependent project identities', () => {
+    expect(deriveMetadata({ pluginName: 'Example Plugin', pluginSlug: 'example-plugin', namespace: 'Vendor\\ExamplePlugin', phpPrefix: 'example_plugin_', cssPrefix: 'ep-' })).toEqual({
+      ...metadata,
+      mainFilename: 'example-plugin.php',
+    });
+  });
+
+  it('exports strict metadata validation', () => {
+    expect(validateMetadata(metadata)).toEqual(metadata);
+    expect(() => validateMetadata({ ...metadata, namespace: 'SingleSegment' })).toThrow(/namespace/i);
+  });
+
   it('replaces identities across text sources and renames the entry file', async () => {
     const root = await fixture();
     await renameProject({ root, metadata });
@@ -83,5 +96,19 @@ describe('renameProject', () => {
     const root = await fixture();
     await renameProject({ root, metadata });
     await expect(renameProject({ root, metadata: { ...metadata, pluginName: 'Other Plugin' } })).rejects.toThrow(/already customized/i);
+  });
+
+  it('leaves source unchanged when an injected staged write fails', async () => {
+    const root = await fixture();
+    const before = await readFile(path.join(root, 'fancyn-plugin-starter.php'), 'utf8');
+    const filesystem = { ...fs, writeFile: async () => { throw new Error('injected staged write failure'); } };
+    await expect(renameProject({ root, metadata, filesystem })).rejects.toThrow(/injected staged write failure/i);
+    expect(await readFile(path.join(root, 'fancyn-plugin-starter.php'), 'utf8')).toBe(before);
+  });
+
+  it('rejects Composer remnants in the staged project', async () => {
+    const root = await fixture();
+    await writeFile(path.join(root, 'composer.json'), '{}');
+    await expect(renameProject({ root, metadata })).rejects.toThrow(/composer\.json/i);
   });
 });
