@@ -12,7 +12,8 @@ const starter = {
   optionPrefix: 'fancyn_plugin_starter_',
   restNamespace: 'fancyn-plugin-starter/v1',
 };
-const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'scripts', 'tests', 'vendor', 'docs/superpowers']);
+const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'scripts', 'vendor', 'docs/superpowers']);
+const excludedFiles = new Set(['tests/scripts/rename-plugin.test.js']);
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mjs', '.php', '.txt', '.xml', '.yml', '.yaml']);
 const defaultFilesystem = { cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile };
 
@@ -47,7 +48,7 @@ export function validateMetadata(metadata) {
 
 function ignored(relativePath) {
   const normalized = relativePath.split(path.sep).join('/');
-  return [...excludedDirectories].some((directory) => normalized === directory || normalized.startsWith(`${directory}/`));
+  return excludedFiles.has(normalized) || [...excludedDirectories].some((directory) => normalized === directory || normalized.startsWith(`${directory}/`));
 }
 
 async function files(root, relative = '', filesystem = defaultFilesystem) {
@@ -66,14 +67,20 @@ async function files(root, relative = '', filesystem = defaultFilesystem) {
 function replacements(metadata) {
   const starterConstant = starter.phpPrefix.replace(/_+$/, '').toUpperCase();
   const targetConstant = metadata.phpPrefix.replace(/_+$/, '').toUpperCase();
+  const starterPrefix = starter.phpPrefix.replace(/_+$/, '');
+  const targetPrefix = metadata.phpPrefix.replace(/_+$/, '');
+  const starterNamespaceRoot = starter.namespace.split('\\')[0];
+  const targetNamespaceRoot = metadata.namespace.split('\\')[0];
   return [
     [starter.namespace.replaceAll('\\', '\\\\'), metadata.namespace.replaceAll('\\', '\\\\')],
     [starter.namespace, metadata.namespace],
     [starterConstant, targetConstant],
     [starter.phpPrefix, metadata.phpPrefix],
+    [starterPrefix, targetPrefix],
     [starter.cssPrefix, metadata.cssPrefix],
     [starter.pluginSlug, metadata.pluginSlug],
     [starter.pluginName, metadata.pluginName],
+    [starterNamespaceRoot, targetNamespaceRoot],
   ];
 }
 
