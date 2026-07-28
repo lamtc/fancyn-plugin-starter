@@ -6,6 +6,7 @@
 /tools/*/
 /tools/.staging/
 /tools/.phpcs-cache
+/tools/phpcs-installed-paths.json
 !/tools/php-tools.json
 
 # Generated assets and reports.

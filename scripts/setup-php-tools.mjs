@@ -7,6 +7,14 @@ import AdmZip from 'adm-zip';
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 const VERSION_PATTERN = /^\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?$/;
+const PHPCS_STANDARD_TOOLS = new Set([
+  'wpcs',
+  'phpcsutils',
+  'phpcsextra',
+  'phpcompatibility',
+  'phpcompatibility-paragonie',
+  'phpcompatibility-wp',
+]);
 
 export function validateManifest(manifest) {
   if (!manifest || !Array.isArray(manifest.tools) || manifest.tools.length === 0) {
@@ -149,6 +157,11 @@ export async function setupPhpTools({
       await rm(staging, { recursive: true, force: true });
     }
   }
+
+  const installedPaths = resolvedManifest.tools
+    .filter((tool) => PHPCS_STANDARD_TOOLS.has(tool.name))
+    .map((tool) => path.resolve(root, 'tools', tool.name, tool.version));
+  await writeFile(path.join(root, 'tools', 'phpcs-installed-paths.json'), `${JSON.stringify(installedPaths, null, 2)}\n`);
 }
 
 async function main() {

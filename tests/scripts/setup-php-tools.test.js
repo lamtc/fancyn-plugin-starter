@@ -125,6 +125,19 @@ describe('setupPhpTools', () => {
     expect(checksum).toHaveBeenCalledWith(body, pharTool(body).sha256);
   });
 
+  it('records local PHPCS standards paths without changing global configuration', async () => {
+    const root = await fixture();
+    const body = Buffer.from('archive fixture');
+    const tool = pharTool(body, { name: 'wpcs', version: '3.4.1', type: 'archive', target: 'wpcs', url: 'https://example.test/wpcs.zip' });
+    const extract = vi.fn(async (_archive, destination) => writeFile(path.join(destination, 'ruleset.xml'), '<ruleset/>'));
+
+    await setupPhpTools({ root, manifest: { tools: [tool] }, fetch: vi.fn(async () => new Response(body)), phpVersion: async () => '8.3.25', extract });
+
+    expect(JSON.parse(await readFile(path.join(root, 'tools', 'phpcs-installed-paths.json'), 'utf8'))).toEqual([
+      path.resolve(root, 'tools', 'wpcs', '3.4.1'),
+    ]);
+  });
+
   it('rejects unsupported PHP before fetching', async () => {
     const root = await fixture();
     const fetch = vi.fn();
