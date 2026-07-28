@@ -46,14 +46,14 @@ Before the live checks, create a clean clone with no `node_modules/`, downloaded
 |---|---|---|
 | WordPress version | PASS | WordPress 7.0.2 on `plugin-dev.test` |
 | PHP version | PASS | PHP 8.3.25 |
-| ZIP SHA-256 | PASS | `25765868727BFEB6FADB8E269C7285BF79D337DAA517E886D8EE5BF4AD47845C` |
-| Install and activate | PASS | Final ZIP expanded to an isolated plugin directory and activated through `activate_plugin()` with no plugin warning or activation error |
-| Dashboard render | PASS | Browser returned the plugin root, production CSS/JS, module script tag, no PHP error text, and no console error |
-| Settings save | PASS | Browser submitted the Settings API form, displayed “Settings saved.”, and rendered the persisted value after redirect |
-| Components showcase | PASS | Dev mode exposed all component sections; Tom Select, color picker, media dialog, editor, modal, tabs, and dropdown initialized without console errors |
-| Keyboard accessibility | PASS | Modal moved focus to Close, closed with Escape, restored trigger focus; ArrowRight changed tab and panel; dropdown closed with Escape; focused input had a visible 2px ring |
-| Responsive layouts | PASS | Browser checks at 1440px, 768px, and 375px reported no horizontal document overflow; editor width remained within its parent |
-| CSS isolation on other admin pages | PASS | WordPress Dashboard loaded zero plugin styles/scripts and retained zero horizontal overflow |
-| REST/AJAX authorization | PASS | Authorized REST and AJAX returned success; logged-out REST returned 401; AJAX without nonce returned 403 |
+| ZIP SHA-256 | PASS | Renamed Windows package: `091D5EC9E6AC0EEE6A0D2EF97EC2F074401A7321E26436A274B2CE66164E0F26` |
+| Install and activate | PASS | `example-deployment-plugin.zip` expanded to an isolated plugin directory; WordPress deactivated the starter copy and activated `example-deployment-plugin/example-deployment-plugin.php` without an activation error |
+| Dashboard render | PASS | Authenticated HTTP returned 200, `.edp-plugin-root`, the renamed production CSS/JS URLs, and a module script; both compiled assets returned 200 |
+| Settings save | PASS | Authenticated Settings API POST redirected with `settings-updated=true`, displayed the saved state, and rendered the persisted “Live npm-only acceptance” value |
+| Components showcase | PARTIAL | Dev mode returned 200 with `.edp-plugin-root`, module assets, Tom Select, color picker, media, editor, modal, tabs, and dropdown contracts; browser runtime was unavailable for direct interaction/console verification. Dev mode was restored to disabled and the URL returned 403 |
+| Keyboard accessibility | PENDING | Requires a connected visual browser; no renamed-package keyboard claim is inferred from source or earlier starter-package evidence |
+| Responsive layouts | PENDING | Requires direct 1440/768/375px browser measurements for the renamed package |
+| CSS isolation on other admin pages | PARTIAL | Authenticated WordPress Dashboard returned zero renamed-plugin asset URLs; visual layout and horizontal-overflow inspection still require a connected browser |
+| REST/AJAX authorization | PASS | Authorized REST and AJAX returned 200 with sanitized values; logged-out REST returned 401; AJAX without a nonce returned 403 |
 
 Do not mark this checklist complete from automated unit tests alone. Record direct live-site evidence for every row.
