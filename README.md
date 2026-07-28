@@ -27,6 +27,22 @@ npm run package
 
 Chạy `npm run init` trước `npm install` để đặt tên cho plugin mới. Trình khởi tạo chỉ sử dụng các module tích hợp sẵn của Node nên chưa cần tải package JavaScript nào ở bước này.
 
+Để tự động dừng khi khởi tạo thất bại, hãy nối các bước trong Bash, Command Prompt hoặc PowerShell 7:
+
+```powershell
+npm run init && npm install && npm run package
+```
+
+Nếu dùng Windows PowerShell 5.1, hãy kiểm tra exit code trước khi chạy bước tiếp theo:
+
+```powershell
+npm run init
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+npm install
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+npm run package
+```
+
 Lần chạy `npm install` đầu tiên sẽ thực thi `postinstall`, sau đó tải PHPUnit, PHPCS, WordPress Coding Standards và các standard phụ thuộc đã được khóa phiên bản và checksum vào cache `tools/` bị Git bỏ qua. Các lần cài đặt sau sẽ tái sử dụng cache hợp lệ, kể cả khi ngoại tuyến. Để buộc làm mới, hãy xóa các thư mục phiên bản được tạo bên dưới `tools/`, nhưng giữ lại manifest `tools/php-tools.json` đang được quản lý bởi Git, rồi chạy lại `npm install`. Lần thiết lập đầu tiên cần truy cập HTTPS đến các URL release đã khóa; nếu proxy hoặc tường lửa chặn tải xuống, hãy cấu hình proxy cho npm/hệ thống rồi thử lại. Nếu checksum không khớp, quá trình thiết lập sẽ dừng mà không thay thế tool hợp lệ trong cache—không được bỏ qua bước kiểm tra hoặc tin tưởng checksum tính từ response lỗi.
 
 Đặt dự án trong `wp-content/plugins`, kích hoạt **Fancyn Plugin Starter**, rồi mở trang Dashboard hoặc Settings của plugin.
@@ -181,6 +197,8 @@ Lệnh này chạy lint, toàn bộ test, production build, xác thực build v�
 ```text
 build/fancyn-plugin-starter.zip
 ```
+
+Sau khi khởi tạo thành công, tên ZIP phải khớp với plugin slug mới. Không upload `fancyn-plugin-starter.zip` vào website đang chứa thư mục source Starter cùng slug, vì WordPress sẽ thay thế thư mục đó bằng nội dung ZIP production.
 
 `.distignore` là nguồn quy tắc loại trừ. ZIP chứa asset đã biên dịch, PHP autoloader thuộc dự án, runtime class, template, ngôn ngữ và README. ZIP loại bỏ source asset, test, script, cấu hình phát triển, `node_modules/`, `tools/`, `vendor/`, Composer manifest, source map và file repository.
 

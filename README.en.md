@@ -27,6 +27,22 @@ npm run package
 
 Run `npm run init` before `npm install` to name the new plugin. The initializer uses only Node built-ins, so no downloaded JavaScript packages are required yet.
 
+To stop automatically when initialization fails, chain the steps in Bash, Command Prompt, or PowerShell 7:
+
+```powershell
+npm run init && npm install && npm run package
+```
+
+When using Windows PowerShell 5.1, check the exit code before running the next step:
+
+```powershell
+npm run init
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+npm install
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+npm run package
+```
+
 The first `npm install` runs `postinstall` and downloads checksum-pinned PHPUnit, PHPCS, WordPress Coding Standards, and their standards dependencies into the ignored `tools/` cache. A later install reuses a valid cache, including offline. To force a refresh, remove the generated version directories beneath `tools/` but preserve the tracked `tools/php-tools.json` manifest, then run `npm install` again. The first setup requires HTTPS access to the pinned release URLs; if a proxy or firewall blocks a download, configure npm/system proxy access and retry. A checksum mismatch aborts setup without replacing a valid cached tool—never bypass it or calculate trust from the failed response.
 
 Place the project in `wp-content/plugins`, activate **Fancyn Plugin Starter**, then open its Dashboard or Settings page.
@@ -181,6 +197,8 @@ The command runs lint, all tests, the production build, build validation, and Co
 ```text
 build/fancyn-plugin-starter.zip
 ```
+
+After successful initialization, the ZIP name must match the new plugin slug. Do not upload `fancyn-plugin-starter.zip` to a site whose Starter source directory uses the same slug, because WordPress will replace that directory with the production ZIP contents.
 
 `.distignore` is the exclusion source. The ZIP contains compiled assets, the project-owned PHP autoloader, runtime classes, templates, languages, and README. It excludes source assets, tests, scripts, development configuration, `node_modules/`, `tools/`, `vendor/`, Composer manifests, source maps, and repository files.
 
