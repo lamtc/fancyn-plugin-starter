@@ -14,14 +14,22 @@ final class Activator {
 	/**
 	 * Activates the plugin when requirements are satisfied.
 	 *
-	 * @param string|null $php_version       PHP version override for tests.
-	 * @param string|null $wordpress_version WordPress version override for tests.
+	 * @param bool $network_wide Whether activation was requested network-wide.
 	 */
-	public static function activate( ?string $php_version = null, ?string $wordpress_version = null ): void {
+	public static function activate( bool $network_wide = false ): void {
 		global $wp_version;
 
-		$php_version       = $php_version ?? PHP_VERSION;
-		$wordpress_version = $wordpress_version ?? (string) $wp_version;
+		unset( $network_wide );
+		self::validate_environment( PHP_VERSION, (string) $wp_version );
+	}
+
+	/**
+	 * Validates explicit environment versions.
+	 *
+	 * @param string $php_version       PHP version.
+	 * @param string $wordpress_version WordPress version.
+	 */
+	public static function validate_environment( string $php_version, string $wordpress_version ): void {
 
 		if ( version_compare( $php_version, '8.1', '<' ) ) {
 			self::reject( __( 'Fancyn Plugin Starter requires PHP 8.1 or newer.', 'fancyn-plugin-starter' ) );

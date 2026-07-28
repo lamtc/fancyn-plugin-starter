@@ -42,7 +42,7 @@ final class ActivatorTest extends TestCase {
 			->andThrow( new RuntimeException( 'unsupported' ) );
 
 		$this->expectException( RuntimeException::class );
-		Activator::activate( '8.0.30', '6.5' );
+		Activator::validate_environment( '8.0.30', '6.5' );
 	}
 
 	/**
@@ -55,7 +55,7 @@ final class ActivatorTest extends TestCase {
 			->andThrow( new RuntimeException( 'unsupported' ) );
 
 		$this->expectException( RuntimeException::class );
-		Activator::activate( '8.1.0', '6.4.9' );
+		Activator::validate_environment( '8.1.0', '6.4.9' );
 	}
 
 	/**
@@ -64,7 +64,18 @@ final class ActivatorTest extends TestCase {
 	public function test_flushes_rules_for_supported_environment(): void {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 
-		Activator::activate( '8.1.0', '6.5' );
+		Activator::validate_environment( '8.1.0', '6.5' );
+		$this->assertTrue( true );
+	}
+
+	/**
+	 * Accepts the network-wide boolean passed by WordPress activation hooks.
+	 */
+	public function test_activation_hook_uses_runtime_versions_instead_of_network_flag(): void {
+		$GLOBALS['wp_version'] = '6.5'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Isolated activation fixture.
+		Functions\expect( 'flush_rewrite_rules' )->once();
+
+		Activator::activate( false );
 		$this->assertTrue( true );
 	}
 }
