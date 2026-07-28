@@ -111,6 +111,20 @@ describe('setupPhpTools', () => {
     await expect(access(path.join(root, 'tools', 'wpcs', '3.4.1', 'ruleset.xml'))).resolves.toBeUndefined();
   });
 
+  it('uses the injected checksum verifier', async () => {
+    const root = await fixture();
+    const body = Buffer.from('phpunit fixture');
+    const checksum = vi.fn(async () => true);
+    await setupPhpTools({
+      root,
+      manifest: { tools: [pharTool(body)] },
+      fetch: vi.fn(async () => new Response(body)),
+      phpVersion: async () => '8.3.25',
+      checksum,
+    });
+    expect(checksum).toHaveBeenCalledWith(body, pharTool(body).sha256);
+  });
+
   it('rejects unsupported PHP before fetching', async () => {
     const root = await fixture();
     const fetch = vi.fn();

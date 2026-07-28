@@ -104,6 +104,7 @@ export async function setupPhpTools({
   fetch: fetchImpl = globalThis.fetch,
   phpVersion = detectPhpVersion,
   extract = extractArchive,
+  checksum = verifyChecksum,
   log = console.log,
 } = {}) {
   const resolvedManifest = manifest ?? JSON.parse(await readFile(path.join(root, 'tools', 'php-tools.json'), 'utf8'));
@@ -129,7 +130,7 @@ export async function setupPhpTools({
       }
       if (!response?.ok) throw new Error(`Failed to download ${tool.name}: HTTP ${response?.status ?? 'unknown'}`);
       const bytes = Buffer.from(await response.arrayBuffer());
-      await verifyChecksum(bytes, tool.sha256);
+      await checksum(bytes, tool.sha256);
       if (tool.type === 'phar') {
         await writeFile(path.join(staging, tool.target), bytes);
       } else {
