@@ -16,7 +16,7 @@
     "lint:php": "node scripts/run-php-tool.mjs phpcs --standard=phpcs.xml.dist",
     "fix:php": "node scripts/run-php-tool.mjs phpcbf --standard=phpcs.xml.dist",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:php",
-    "test:js": "vitest run --passWithNoTests",
+    "test:js": "vitest run tests --passWithNoTests",
     "test:php": "node scripts/run-php-tool.mjs phpunit --configuration phpunit.xml.dist",
     "test": "npm run test:js && npm run test:php",
     "validate:build": "node scripts/validate-build.mjs",

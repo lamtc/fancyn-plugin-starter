@@ -12,7 +12,7 @@ const starter = {
   optionPrefix: 'fancyn_plugin_starter_',
   restNamespace: 'fancyn-plugin-starter/v1',
 };
-const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'build', 'coverage', 'node_modules', 'vendor', 'docs/superpowers']);
+const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'scripts', 'tests', 'vendor', 'docs/superpowers']);
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mjs', '.php', '.txt', '.xml', '.yml', '.yaml']);
 const defaultFilesystem = { cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile };
 
@@ -58,7 +58,7 @@ async function files(root, relative = '', filesystem = defaultFilesystem) {
     const child = path.join(relative, entry.name);
     if (ignored(child)) continue;
     if (entry.isDirectory()) found.push(...await files(root, child, filesystem));
-    else if (entry.isFile() && textExtensions.has(path.extname(entry.name).toLowerCase())) found.push(child);
+    else if (entry.isFile() && (textExtensions.has(path.extname(entry.name).toLowerCase()) || /\.(?:php|xml)\.dist$/i.test(entry.name))) found.push(child);
   }
   return found;
 }

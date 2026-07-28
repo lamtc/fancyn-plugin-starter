@@ -24,6 +24,7 @@ async function fixture() {
   await mkdir(path.join(root, 'includes'), { recursive: true });
   await mkdir(path.join(root, 'assets', 'src'), { recursive: true });
   await mkdir(path.join(root, 'docs', 'superpowers'), { recursive: true });
+  await mkdir(path.join(root, 'scripts'), { recursive: true });
   await writeFile(path.join(root, 'plugin.json'), JSON.stringify({
     pluginName: 'Fancyn Plugin Starter', pluginSlug: 'fancyn-plugin-starter', textDomain: 'fancyn-plugin-starter',
     namespace: 'Fancyn\\PluginStarter', phpPrefix: 'fancyn_plugin_starter_', cssPrefix: 'fps-',
@@ -34,6 +35,8 @@ async function fixture() {
   await writeFile(path.join(root, 'includes', 'Autoloader.php'), "new Autoloader( 'Fancyn\\\\PluginStarter', __DIR__ );");
   await writeFile(path.join(root, 'assets', 'src', 'admin.css'), '.fps-plugin-root { color: red; }');
   await writeFile(path.join(root, 'docs', 'superpowers', 'history.md'), 'Fancyn Plugin Starter');
+  await writeFile(path.join(root, 'scripts', 'rename-plugin.mjs'), "const starter = 'fancyn-plugin-starter';");
+  await writeFile(path.join(root, 'phpcs.xml.dist'), '<file>fancyn-plugin-starter.php</file>');
   return root;
 }
 
@@ -64,6 +67,8 @@ describe('renameProject', () => {
     expect(entry).toContain('EXAMPLE_PLUGIN');
     expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.ep-plugin-root');
     expect(await readFile(path.join(root, 'includes', 'Autoloader.php'), 'utf8')).toContain("'Vendor\\\\ExamplePlugin'");
+    expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('example-plugin.php');
+    expect(await readFile(path.join(root, 'scripts', 'rename-plugin.mjs'), 'utf8')).toContain("'fancyn-plugin-starter'");
   });
 
   it('preserves historical superpowers documents', async () => {
