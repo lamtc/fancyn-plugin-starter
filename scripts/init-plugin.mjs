@@ -12,6 +12,17 @@ const questions = [
   { key: 'cssPrefix', message: 'CSS prefix' },
 ];
 
+export async function readPipedAnswers(stream = process.stdin) {
+  let input = '';
+  for await (const chunk of stream) input += chunk.toString();
+  const answers = input.replace(/\r\n/g, '\n').split('\n');
+  if (answers.at(-1) === '') answers.pop();
+  return async () => {
+    if (!answers.length) throw new Error('Piped initialization input ended before all answers were provided.');
+    return answers.shift();
+  };
+}
+
 export async function initializeProject({
   root = process.cwd(),
   prompt,
@@ -37,6 +48,13 @@ export async function initializeProject({
 }
 
 async function main() {
+  if (!process.stdin.isTTY) {
+    const prompt = await readPipedAnswers();
+    const result = await initializeProject({ prompt });
+    process.stdout.write(result.confirmed ? `Initialization complete (${result.changed} project update).\n` : 'Initialization cancelled. No files were changed.\n');
+    return;
+  }
+
   const readline = createInterface({ input: process.stdin, output: process.stdout });
   try {
     const prompt = ({ message }) => readline.question(`${message}: `);

@@ -1,7 +1,8 @@
 import { readFile } from 'node:fs/promises';
+import { Readable } from 'node:stream';
 import { describe, expect, it, vi } from 'vitest';
 
-import { initializeProject } from '../../scripts/init-plugin.mjs';
+import { initializeProject, readPipedAnswers } from '../../scripts/init-plugin.mjs';
 
 const answersFor = (values) => {
   const remaining = [...values];
@@ -54,5 +55,10 @@ describe('initializeProject', () => {
     const source = await readFile(new URL('../../scripts/init-plugin.mjs', import.meta.url), 'utf8');
     const imports = [...source.matchAll(/from ['"]([^'"]+)['"]/g)].map((match) => match[1]);
     expect(imports.every((specifier) => specifier.startsWith('node:') || specifier === './rename-plugin.mjs')).toBe(true);
+  });
+
+  it('consumes every newline-delimited answer from piped stdin', async () => {
+    const prompt = await readPipedAnswers(Readable.from(['Name\nslug\nVendor\\Plugin\nprefix_\ncss-\nyes\n']));
+    await expect(Promise.all(Array.from({ length: 6 }, () => prompt()))).resolves.toEqual(['Name', 'slug', 'Vendor\\Plugin', 'prefix_', 'css-', 'yes']);
   });
 });
