@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { validateBuild } from '../../scripts/validate-build.mjs';
+import { validateBuild, validateNpmOnlySource } from '../../scripts/validate-build.mjs';
 
 const roots = [];
 async function fixture() {
@@ -36,5 +36,13 @@ describe('validateBuild', () => {
     const root = await fixture();
     await writeFile(path.join(root, 'assets', 'dist', 'assets', 'admin.js.map'), '{}');
     await expect(validateBuild(root)).rejects.toThrow(/source map/i);
+  });
+
+  it.each(['composer.lock', 'vendor'])('rejects forbidden npm-only source path %s', async (forbidden) => {
+    const root = await fixture();
+    const target = path.join(root, forbidden);
+    if (forbidden.includes('.')) await writeFile(target, '{}');
+    else await mkdir(target);
+    await expect(validateNpmOnlySource(root)).rejects.toThrow(new RegExp(`${forbidden}.*npm-only`, 'i'));
   });
 });
