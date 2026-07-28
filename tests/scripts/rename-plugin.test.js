@@ -120,6 +120,31 @@ describe('renameProject', () => {
     expect(await readFile(path.join(root, 'fancyn-plugin-starter.php'), 'utf8')).toBe(before);
   });
 
+  it('rolls back every file when an injected apply copy fails', async () => {
+    const root = await fixture();
+    const beforeEntry = await readFile(path.join(root, 'fancyn-plugin-starter.php'), 'utf8');
+    const beforeClass = await readFile(path.join(root, 'includes', 'Example.php'), 'utf8');
+    const beforeMetadata = await readFile(path.join(root, 'plugin.json'), 'utf8');
+    let failed = false;
+    const filesystem = {
+      ...fs,
+      cp: async (source, destination, options) => {
+        const isApplyTarget = path.resolve(destination) === path.resolve(root, 'includes', 'Example.php') && String(source).includes('-rename-');
+        if (isApplyTarget && !failed) {
+          failed = true;
+          throw new Error('injected apply copy failure');
+        }
+        return fs.cp(source, destination, options);
+      },
+    };
+
+    await expect(renameProject({ root, metadata, filesystem })).rejects.toThrow(/injected apply copy failure/i);
+    expect(await readFile(path.join(root, 'fancyn-plugin-starter.php'), 'utf8')).toBe(beforeEntry);
+    expect(await readFile(path.join(root, 'includes', 'Example.php'), 'utf8')).toBe(beforeClass);
+    expect(await readFile(path.join(root, 'plugin.json'), 'utf8')).toBe(beforeMetadata);
+    await expect(readFile(path.join(root, 'example-plugin.php'))).rejects.toThrow();
+  });
+
   it('rejects Composer remnants in the staged project', async () => {
     const root = await fixture();
     await writeFile(path.join(root, 'composer.json'), '{}');

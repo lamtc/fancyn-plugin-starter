@@ -110,15 +110,50 @@ async function customizeStage(stage, metadata, filesystem) {
 }
 
 async function applyStage(stage, root, metadata, filesystem) {
-  for (const relative of await files(stage, '', filesystem)) {
-    const target = path.join(root, relative);
-    await filesystem.mkdir(path.dirname(target), { recursive: true });
-    await filesystem.cp(path.join(stage, relative), target, { force: true });
-  }
-  if (metadata.pluginSlug !== starter.pluginSlug) {
-    await filesystem.unlink(path.join(root, `${starter.pluginSlug}.php`)).catch((error) => {
-      if (error.code !== 'ENOENT') throw error;
-    });
+  const stagedFiles = await files(stage, '', filesystem);
+  const oldEntryRelative = `${starter.pluginSlug}.php`;
+  const targets = [...new Set([...stagedFiles, ...(metadata.pluginSlug !== starter.pluginSlug ? [oldEntryRelative] : [])])];
+  const rollback = `${stage}-rollback`;
+  const records = [];
+
+  try {
+    await filesystem.mkdir(rollback, { recursive: true });
+    for (const relative of targets) {
+      const target = path.join(root, relative);
+      const existed = await filesystem.readFile(target).then(() => true).catch(() => false);
+      records.push({ relative, existed });
+      if (existed) {
+        const backup = path.join(rollback, relative);
+        await filesystem.mkdir(path.dirname(backup), { recursive: true });
+        await filesystem.cp(target, backup, { force: true });
+      }
+    }
+
+    for (const relative of stagedFiles) {
+      const target = path.join(root, relative);
+      await filesystem.mkdir(path.dirname(target), { recursive: true });
+      await filesystem.cp(path.join(stage, relative), target, { force: true });
+    }
+    if (metadata.pluginSlug !== starter.pluginSlug) {
+      await filesystem.unlink(path.join(root, oldEntryRelative)).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      });
+    }
+  } catch (error) {
+    for (const record of records) {
+      const target = path.join(root, record.relative);
+      if (record.existed) {
+        await filesystem.mkdir(path.dirname(target), { recursive: true });
+        await filesystem.cp(path.join(rollback, record.relative), target, { force: true });
+      } else {
+        await filesystem.unlink(target).catch((unlinkError) => {
+          if (unlinkError.code !== 'ENOENT') throw unlinkError;
+        });
+      }
+    }
+    throw error;
+  } finally {
+    await filesystem.rm(rollback, { recursive: true, force: true });
   }
 }
 
