@@ -106,6 +106,25 @@ async function installAtomically(staging, destination) {
   }
 }
 
+async function fetchWithRetry(fetchImpl, tool, retryDelay, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetchImpl(tool.url);
+      if (response?.ok) return response;
+      const status = response?.status ?? 'unknown';
+      const retryable = status === 429 || (typeof status === 'number' && status >= 500);
+      if (!retryable || attempt === attempts) throw new Error(`HTTP ${status}`);
+      lastError = new Error(`HTTP ${status}`);
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) break;
+    }
+    await retryDelay(attempt);
+  }
+  throw new Error(`Failed to download ${tool.name}: ${lastError?.message ?? 'unknown network error'}`, { cause: lastError });
+}
+
 export async function setupPhpTools({
   root = process.cwd(),
   manifest,
@@ -114,6 +133,7 @@ export async function setupPhpTools({
   extract = extractArchive,
   checksum = verifyChecksum,
   log = console.log,
+  retryDelay = (attempt) => new Promise((resolve) => setTimeout(resolve, attempt * 250)),
 } = {}) {
   const resolvedManifest = manifest ?? JSON.parse(await readFile(path.join(root, 'tools', 'php-tools.json'), 'utf8'));
   validateManifest(resolvedManifest);
@@ -130,13 +150,7 @@ export async function setupPhpTools({
 
     const staging = await mkdtemp(path.join(stagingRoot, `${tool.name}-`));
     try {
-      let response;
-      try {
-        response = await fetchImpl(tool.url);
-      } catch (error) {
-        throw new Error(`Failed to download ${tool.name}: ${error.message}`, { cause: error });
-      }
-      if (!response?.ok) throw new Error(`Failed to download ${tool.name}: HTTP ${response?.status ?? 'unknown'}`);
+      const response = await fetchWithRetry(fetchImpl, tool, retryDelay);
       const bytes = Buffer.from(await response.arrayBuffer());
       await checksum(bytes, tool.sha256);
       if (tool.type === 'phar') {

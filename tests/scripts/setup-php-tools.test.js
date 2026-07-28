@@ -152,7 +152,25 @@ describe('setupPhpTools', () => {
       manifest: { tools: [pharTool()] },
       fetch: vi.fn(async () => { throw new Error('network unavailable'); }),
       phpVersion: async () => '8.3.25',
+      retryDelay: async () => {},
     })).rejects.toThrow(/phpunit.*network unavailable/i);
+  });
+
+  it('retries a transient network failure before installing', async () => {
+    const root = await fixture();
+    const body = Buffer.from('phpunit fixture');
+    const fetch = vi.fn()
+      .mockRejectedValueOnce(new Error('temporary reset'))
+      .mockResolvedValueOnce(new Response(body));
+    await setupPhpTools({
+      root,
+      manifest: { tools: [pharTool(body)] },
+      fetch,
+      phpVersion: async () => '8.3.25',
+      retryDelay: async () => {},
+    });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(await readFile(path.join(root, 'tools', 'phpunit', '10.5.64', 'phpunit.phar'), 'utf8')).toBe('phpunit fixture');
   });
 });
 
