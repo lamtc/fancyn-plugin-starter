@@ -62,7 +62,8 @@ Mỗi plugin sau khi tạo phải:
 - Vite
 - `@tailwindcss/forms`
 - ES Modules
-- Composer PSR-4 autoloading
+- Project-owned PHP namespace autoloader; Composer is unsupported
+- npm-provisioned, checksum-pinned PHPUnit, PHPCS, WPCS, and standards dependencies
 
 ### Tích hợp sẵn
 
@@ -152,10 +153,14 @@ wordpress-plugin-starter/
 ├── languages/
 ├── scripts/
 │   ├── build-zip.mjs
+│   ├── init-plugin.mjs
 │   ├── rename-plugin.mjs
+│   ├── run-php-tool.mjs
+│   ├── setup-php-tools.mjs
 │   └── validate-build.mjs
+├── tools/
+│   └── php-tools.json
 ├── tests/
-├── composer.json
 ├── package.json
 ├── vite.config.js
 ├── tailwind.config.js
@@ -753,6 +758,8 @@ Không đưa các mục sau vào ZIP:
 
 ```text
 node_modules/
+tools/
+vendor/
 .git/
 .github/
 tests/
@@ -764,12 +771,14 @@ tailwind.config.js
 postcss.config.js
 package.json
 package-lock.json
+composer.json
+composer.lock
 phpunit.xml
 .env*
 .DS_Store
 ```
 
-Có thể giữ `composer.json` tùy chính sách phân phối, nhưng không đưa thư mục development dependencies vào ZIP.
+Composer không được hỗ trợ. ZIP phải loại trừ `composer.json`, `composer.lock`, `vendor/`, `tools/` và mọi development dependency; runtime phải dùng `includes/Autoloader.php`.
 
 Dùng `.distignore` làm nguồn quy tắc loại trừ.
 
@@ -797,6 +806,10 @@ Chạy unit tests.
 
 Build và tạo ZIP.
 
+### `npm run init`
+
+Hỏi plugin name, slug, PHP namespace, PHP prefix và CSS prefix; hiển thị toàn bộ metadata suy ra để xác nhận rồi đổi project bằng staged rename engine có tính atomic và idempotent. Script chỉ dùng Node built-ins và phải chạy được trước `npm install`.
+
 ### `npm run rename`
 
 Đổi toàn bộ metadata starter sang plugin mới.
@@ -807,7 +820,7 @@ Build và tạo ZIP.
 
 ### PHP
 
-- WordPress Coding Standards hoặc PSR-12, chọn một và dùng nhất quán.
+- Bắt buộc WordPress Coding Standards; không dùng PSR-12 làm standard thay thế.
 - Namespace cho class.
 - Function global phải có prefix.
 - Type declarations khi phù hợp.

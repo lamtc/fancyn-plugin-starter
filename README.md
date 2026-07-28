@@ -6,16 +6,26 @@ A standalone WordPress admin-plugin starter using PHP components, scoped Tailwin
 
 - WordPress 6.5 or newer
 - PHP 8.1 or newer
-- Composer 2
 - Node.js 20.19 or newer
 - npm 10 or newer
+
+Composer is unsupported and unnecessary. PHP remains a system runtime invoked by npm commands.
 
 ## Install for development
 
 ```bash
-composer install
+git clone <repository-url>
+cd fancyn-plugin-starter
+npm run init
 npm install
+npm run lint
+npm test
+npm run package
 ```
+
+Run `npm run init` before `npm install` to name the new plugin. The initializer uses only Node built-ins, so no downloaded JavaScript packages are required yet.
+
+The first `npm install` runs `postinstall` and downloads checksum-pinned PHPUnit, PHPCS, WordPress Coding Standards, and their standards dependencies into the ignored `tools/` cache. A later install reuses a valid cache, including offline. Delete `tools/` to force a refresh. The first setup requires HTTPS access to the pinned release URLs; if a proxy or firewall blocks a download, configure npm/system proxy access and retry. A checksum mismatch aborts setup without replacing a valid cached tool—never bypass it or calculate trust from the failed response.
 
 Place the project in `wp-content/plugins`, activate **Fancyn Plugin Starter**, then open its Dashboard or Settings page.
 
@@ -54,8 +64,8 @@ npm run test
 npm run build
 ```
 
-- PHP follows WordPress Coding Standards with documented PSR-4 filename exceptions.
-- PHPUnit and Brain Monkey cover PHP services and components.
+- PHP follows WordPress Coding Standards with documented namespaced filename exceptions.
+- The checksum-pinned PHPUnit PHAR and repository-owned WordPress shim cover PHP services and components.
 - Vitest covers JavaScript behavior and Node release scripts.
 - ESLint and Stylelint check authored JavaScript and CSS.
 
@@ -66,7 +76,7 @@ npm run build
 - `assets/src/` contains authored JavaScript and CSS; `assets/dist/` is generated and must not be edited by hand.
 - `languages/` contains translation catalogs.
 - `scripts/` contains rename, validation, and packaging tooling; `tests/` mirrors PHP, JavaScript, script, and acceptance responsibilities.
-- `vendor/`, `node_modules/`, `assets/dist/`, and `build/` are generated locally. Only production Composer dependencies and compiled assets enter the release ZIP.
+- `tools/`, `node_modules/`, `assets/dist/`, and `build/` are generated locally. Downloaded tools and development dependencies never enter the release ZIP.
 
 ## Component usage
 
@@ -121,9 +131,19 @@ WordPress media/editor/color dependencies load only on pages that use them.
 
 REST and AJAX examples are authenticated and require `manage_options`. The REST route declares a schema and permission callback. AJAX validates its nonce before sanitizing input. No public `nopriv` action is registered.
 
-## Rename the starter
+## Initialize the starter
 
-Create a metadata file outside the project, for example `new-plugin.json`:
+Run the interactive initializer before installing dependencies:
+
+```bash
+npm run init
+```
+
+It asks, in order, for plugin name, plugin slug, PHP namespace, PHP prefix, and CSS prefix. It derives the text domain, option prefix, REST namespace, and main PHP filename, displays the complete JSON configuration, then requires an explicit `yes` confirmation. Answering anything else cancels with no file changes.
+
+Validation requires a lowercase hyphenated slug, at least two valid PHP namespace segments, a lowercase snake-case PHP prefix ending in `_`, and a lowercase CSS prefix ending in `-`. Running again with identical metadata is safe; different metadata is rejected after initialization.
+
+For automation, create a metadata file outside the project, for example `new-plugin.json`:
 
 ```json
 {
@@ -144,7 +164,7 @@ Run:
 npm run rename -- --config ../new-plugin.json
 ```
 
-The rename script validates metadata, stages replacements before applying them, renames the main plugin file, updates `plugin.json`, and fails if starter placeholders remain. Re-running identical metadata is safe; changing an already customized project is rejected.
+The JSON rename mode uses the same validation and staged engine as interactive initialization.
 
 For version 1.0, the text domain must equal the plugin slug and the option prefix must equal the PHP prefix.
 
@@ -154,15 +174,15 @@ For version 1.0, the text domain must equal the plugin slug and the option prefi
 npm run package
 ```
 
-The command runs lint, all tests, the production build, build validation, Composer production autoload generation, and ZIP creation. Output:
+The command runs lint, all tests, the production build, build validation, and Composer-free ZIP creation. Output:
 
 ```text
 build/fancyn-plugin-starter.zip
 ```
 
-`.distignore` is the exclusion source. The ZIP contains compiled assets, PHP runtime files, templates, languages, README, and Composer production autoload files. It excludes source assets, tests, scripts, development configuration, Node dependencies, source maps, and repository files.
+`.distignore` is the exclusion source. The ZIP contains compiled assets, the project-owned PHP autoloader, runtime classes, templates, languages, and README. It excludes source assets, tests, scripts, development configuration, `node_modules/`, `tools/`, `vendor/`, Composer manifests, source maps, and repository files.
 
-The ZIP requires neither Node nor Composer after installation.
+The ZIP requires only the supported WordPress/PHP runtime after installation.
 
 ## Clean-site verification
 
@@ -176,7 +196,7 @@ Install the WordPress i18n command once, then regenerate the translation templat
 
 ```bash
 wp package install wp-cli/i18n-command
-wp i18n make-pot . languages/fancyn-plugin-starter.pot --domain=fancyn-plugin-starter --exclude=vendor,node_modules,assets/dist,build,.worktrees
+wp i18n make-pot . languages/fancyn-plugin-starter.pot --domain=fancyn-plugin-starter --exclude=node_modules,tools,assets/dist,build,.worktrees
 ```
 
 Commit the generated POT file when preparing a translated release. Run the command again after renaming so the slug, text domain, and output filename match the renamed project.
