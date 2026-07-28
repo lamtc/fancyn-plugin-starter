@@ -1,1 +1,24 @@
 .worktrees/
+
+# PHP and JavaScript dependencies.
+/vendor/
+/node_modules/
+
+# Generated assets and reports.
+/assets/dist/
+/build/
+/coverage/
+/artifacts/
+
+# Local environment files.
+.env
+.env.*
+!.env.example
+
+# Editor and operating-system noise.
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,40 @@
+{
+  "name": "fancyn-plugin-starter",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"assets/src/**/*.css\" --allow-empty-input",
+    "lint": "npm run lint:js && npm run lint:css && composer lint:php",
+    "test:js": "vitest run --passWithNoTests",
+    "test": "npm run test:js && composer test:php",
+    "validate:build": "node scripts/validate-build.js",
+    "package": "node scripts/package.js",
+    "rename": "node scripts/rename.js"
+  },
+  "dependencies": {
+    "alpinejs": "^3.14.0",
+    "tom-select": "^2.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "archiver": "^7.0.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "ignore": "^6.0.2",
+    "jsdom": "^24.0.0",
+    "postcss": "^8.4.49",
+    "stylelint": "^16.0.0",
+    "stylelint-config-standard": "^36.0.0",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
