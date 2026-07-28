@@ -40,6 +40,7 @@ export function validateMetadata(metadata) {
   if (metadata.textDomain !== metadata.pluginSlug) throw new Error('Invalid textDomain: it must match pluginSlug.');
   if (!/^[A-Z][A-Za-z0-9]*(?:\\[A-Z][A-Za-z0-9]*)+$/.test(metadata.namespace)) throw new Error('Invalid namespace.');
   if (!/^[a-z][a-z0-9_]*_$/.test(metadata.phpPrefix)) throw new Error('Invalid phpPrefix.');
+  if (metadata.phpPrefix.replace(/_+$/, '').length < 4) throw new Error('Invalid phpPrefix: at least 4 characters are required before the trailing underscore.');
   if (!/^[a-z][a-z0-9-]*-$/.test(metadata.cssPrefix)) throw new Error('Invalid cssPrefix.');
   if (metadata.optionPrefix !== metadata.phpPrefix) throw new Error('Invalid optionPrefix: it must match phpPrefix in v1.0.');
   if (metadata.restNamespace !== `${metadata.pluginSlug}/v1`) throw new Error('Invalid restNamespace: expected <pluginSlug>/v1.');

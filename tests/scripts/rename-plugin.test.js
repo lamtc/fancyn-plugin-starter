@@ -22,9 +22,9 @@ const brandedMetadata = {
   pluginSlug: 'fancyn-car-booking',
   textDomain: 'fancyn-car-booking',
   namespace: 'Fancyn\\CarBooking',
-  phpPrefix: 'fcb_',
+  phpPrefix: 'fcbook_',
   cssPrefix: 'fcb-',
-  optionPrefix: 'fcb_',
+  optionPrefix: 'fcbook_',
   restNamespace: 'fancyn-car-booking/v1',
 };
 
@@ -69,6 +69,7 @@ describe('renameProject', () => {
   it('exports strict metadata validation', () => {
     expect(validateMetadata(metadata)).toEqual(metadata);
     expect(() => validateMetadata({ ...metadata, namespace: 'SingleSegment' })).toThrow(/namespace/i);
+    expect(() => validateMetadata({ ...metadata, phpPrefix: 'fcb_', optionPrefix: 'fcb_' })).toThrow(/at least 4 characters/i);
   });
 
   it('replaces identities across text sources and renames the entry file', async () => {
@@ -97,8 +98,8 @@ describe('renameProject', () => {
     const entry = await readFile(path.join(root, 'fancyn-car-booking.php'), 'utf8');
     expect(entry).toContain('Fancyn Car Booking');
     expect(entry).toContain('Fancyn\\CarBooking');
-    expect(entry).toContain('fcb_');
-    expect(entry).toContain('FCB');
+    expect(entry).toContain('fcbook_');
+    expect(entry).toContain('FCBOOK');
     expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.fcb-plugin-root');
     expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('<element value="Fancyn"/>');
     await expect(readFile(path.join(root, 'fancyn-plugin-starter.php'))).rejects.toThrow();

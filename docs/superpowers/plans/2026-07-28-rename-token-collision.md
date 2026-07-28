@@ -26,9 +26,9 @@ const brandedMetadata = {
   pluginSlug: 'fancyn-car-booking',
   textDomain: 'fancyn-car-booking',
   namespace: 'Fancyn\\CarBooking',
-  phpPrefix: 'fcb_',
+  phpPrefix: 'fcbook_',
   cssPrefix: 'fcb-',
-  optionPrefix: 'fcb_',
+  optionPrefix: 'fcbook_',
   restNamespace: 'fancyn-car-booking/v1',
 };
 ```
@@ -45,8 +45,8 @@ it('allows the new identity to retain the Fancyn brand and namespace root', asyn
   const entry = await readFile(path.join(root, 'fancyn-car-booking.php'), 'utf8');
   expect(entry).toContain('Fancyn Car Booking');
   expect(entry).toContain('Fancyn\\CarBooking');
-  expect(entry).toContain('fcb_');
-  expect(entry).toContain('FCB');
+  expect(entry).toContain('fcbook_');
+  expect(entry).toContain('FCBOOK');
   expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.fcb-plugin-root');
   expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('<element value="Fancyn"/>');
   await expect(readFile(path.join(root, 'fancyn-plugin-starter.php'))).rejects.toThrow();
@@ -121,6 +121,10 @@ npx vitest run tests/scripts/rename-plugin.test.js tests/scripts/init-plugin.tes
 ```
 
 Expected: all rename and initializer tests pass, including idempotency and rollback tests.
+
+- [ ] **Step 3a: Reject PHP prefixes that WPCS considers too short**
+
+Add a validation assertion that `fcb_` is rejected with an `at least 4 characters` message, then update `validateMetadata()` so the portion before the trailing underscore contains at least four characters.
 
 - [ ] **Step 4: Commit the implementation**
 
@@ -202,7 +206,7 @@ Clone the feature branch into a temporary directory, pipe these six answers to `
 Fancyn Car Booking
 fancyn-car-booking
 Fancyn\CarBooking
-fcb_
+fcbook_
 fcb-
 yes
 ```

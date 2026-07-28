@@ -10,7 +10,7 @@ Trường hợp bắt buộc phải hoạt động:
 Plugin name: Fancyn Car Booking
 Plugin slug: fancyn-car-booking
 PHP namespace: Fancyn\CarBooking
-PHP prefix: fcb_
+PHP prefix: fcbook_
 CSS prefix: fcb-
 ```
 
@@ -32,6 +32,8 @@ Sau khi `init` thất bại, transaction rollback đúng về identity Starter. 
 ## Hành vi lỗi và rollback
 
 - Validation metadata vẫn chạy trước khi tạo stage.
+- PHP prefix phải có ít nhất bốn ký tự trước dấu `_`, đồng nhất với `WordPress.NamingConventions.PrefixAllGlobals` của WPCS 3.4.1.
+- Prefix ngắn như `fcb_` phải bị từ chối ngay trong `npm run init` với thông báo nêu rõ độ dài tối thiểu.
 - Mọi lỗi trong stage hoặc apply tiếp tục trả exit code khác 0.
 - Source phải được rollback nguyên trạng nếu validation sau replacement thất bại.
 - Không tạo marker trạng thái mới hoặc thay đổi identity khi rename thất bại.
@@ -50,7 +52,8 @@ Không thêm khóa cứng cấm đóng gói identity Starter vì maintainer vẫ
 
 ## Kiểm thử
 
-- Regression test gọi rename engine với chính metadata `Fancyn Car Booking` và xác nhận thành công.
+- Regression test gọi rename engine với metadata `Fancyn Car Booking`, namespace `Fancyn\CarBooking`, PHP prefix `fcbook_` và xác nhận thành công.
+- Validation test xác nhận `fcb_` bị từ chối trước khi rename.
 - Kiểm tra main PHP file đổi thành `fancyn-car-booking.php` và file cũ biến mất.
 - Kiểm tra namespace `Fancyn\CarBooking`, plugin name, slug, PHP prefix và CSS prefix xuất hiện đúng.
 - Kiểm tra `phpcs.xml.dist` vẫn dùng namespace root `Fancyn` hợp lệ.

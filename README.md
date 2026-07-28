@@ -159,7 +159,7 @@ npm run init
 
 Trình khởi tạo lần lượt hỏi tên plugin, plugin slug, PHP namespace, PHP prefix và CSS prefix. Từ đó, công cụ suy ra text domain, option prefix, REST namespace và tên file PHP chính; hiển thị cấu hình JSON đầy đủ rồi yêu cầu xác nhận rõ ràng bằng `yes`. Câu trả lời khác sẽ hủy thao tác mà không thay đổi file.
 
-Quy tắc xác thực yêu cầu slug viết thường và phân tách bằng dấu gạch ngang; PHP namespace có ít nhất hai segment hợp lệ; PHP prefix dùng snake case chữ thường và kết thúc bằng `_`; CSS prefix viết thường và kết thúc bằng `-`. Chạy lại với metadata giống hệt là an toàn; metadata khác sẽ bị từ chối sau khi dự án đã khởi tạo.
+Quy tắc xác thực yêu cầu slug viết thường và phân tách bằng dấu gạch ngang; PHP namespace có ít nhất hai segment hợp lệ; PHP prefix dùng snake case chữ thường, có ít nhất bốn ký tự trước dấu `_` cuối để đáp ứng WPCS; CSS prefix viết thường và kết thúc bằng `-`. Ví dụ, dùng `fcbook_` thay vì `fcb_`. Chạy lại với metadata giống hệt là an toàn; metadata khác sẽ bị từ chối sau khi dự án đã khởi tạo.
 
 Để tự động hóa, hãy tạo một file metadata bên ngoài dự án, ví dụ `new-plugin.json`:
 

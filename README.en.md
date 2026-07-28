@@ -159,7 +159,7 @@ npm run init
 
 It asks, in order, for plugin name, plugin slug, PHP namespace, PHP prefix, and CSS prefix. It derives the text domain, option prefix, REST namespace, and main PHP filename, displays the complete JSON configuration, then requires an explicit `yes` confirmation. Answering anything else cancels with no file changes.
 
-Validation requires a lowercase hyphenated slug, at least two valid PHP namespace segments, a lowercase snake-case PHP prefix ending in `_`, and a lowercase CSS prefix ending in `-`. Running again with identical metadata is safe; different metadata is rejected after initialization.
+Validation requires a lowercase hyphenated slug, at least two valid PHP namespace segments, a lowercase snake-case PHP prefix with at least four characters before its trailing `_` to satisfy WPCS, and a lowercase CSS prefix ending in `-`. For example, use `fcbook_` instead of `fcb_`. Running again with identical metadata is safe; different metadata is rejected after initialization.
 
 For automation, create a metadata file outside the project, for example `new-plugin.json`:
 
