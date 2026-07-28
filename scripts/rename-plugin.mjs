@@ -52,6 +52,7 @@ function replacements(metadata) {
   const starterConstant = starter.phpPrefix.replace(/_+$/, '').toUpperCase();
   const targetConstant = metadata.phpPrefix.replace(/_+$/, '').toUpperCase();
   return [
+    [starter.namespace.replaceAll('\\', '\\\\'), metadata.namespace.replaceAll('\\', '\\\\')],
     [starter.namespace, metadata.namespace],
     [starterConstant, targetConstant],
     [starter.phpPrefix, metadata.phpPrefix],

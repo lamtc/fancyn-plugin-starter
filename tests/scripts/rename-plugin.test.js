@@ -30,6 +30,7 @@ async function fixture() {
   }, null, 2));
   await writeFile(path.join(root, 'fancyn-plugin-starter.php'), 'Fancyn Plugin Starter Fancyn\\PluginStarter fancyn_plugin_starter_ FANCYN_PLUGIN_STARTER fps- fancyn-plugin-starter');
   await writeFile(path.join(root, 'includes', 'Example.php'), 'namespace Fancyn\\PluginStarter;');
+  await writeFile(path.join(root, 'includes', 'Autoloader.php'), "new Autoloader( 'Fancyn\\\\PluginStarter', __DIR__ );");
   await writeFile(path.join(root, 'assets', 'src', 'admin.css'), '.fps-plugin-root { color: red; }');
   await writeFile(path.join(root, 'docs', 'superpowers', 'history.md'), 'Fancyn Plugin Starter');
   return root;
@@ -49,6 +50,7 @@ describe('renameProject', () => {
     expect(entry).toContain('example_plugin_');
     expect(entry).toContain('EXAMPLE_PLUGIN');
     expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.ep-plugin-root');
+    expect(await readFile(path.join(root, 'includes', 'Autoloader.php'), 'utf8')).toContain("'Vendor\\\\ExamplePlugin'");
   });
 
   it('preserves historical superpowers documents', async () => {

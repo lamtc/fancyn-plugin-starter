@@ -8,6 +8,7 @@
 	failOnWarning="true"
 >
 	<testsuites>
+		<testsuite name="autoloader"><file>tests/php/AutoloaderTest.php</file></testsuite>
 		<testsuite name="core"><directory>tests/php/core</directory></testsuite>
 		<testsuite name="admin"><directory>tests/php/admin</directory></testsuite>
 		<testsuite name="support"><directory>tests/php/support</directory></testsuite>
