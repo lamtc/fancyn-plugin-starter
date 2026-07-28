@@ -3,14 +3,14 @@
 ## Automated release evidence
 
 - `npm run lint`: PASS on 2026-07-28; ESLint, Stylelint, and npm-provisioned PHPCS exited 0 (66 PHP files checked).
-- `npm run test`: PASS on 2026-07-28; Vitest passed 84 tests in 13 files and npm-provisioned PHPUnit passed 109 tests with 466 assertions.
+- `npm run test`: PASS on 2026-07-28; Vitest passed 87 tests in 13 files and npm-provisioned PHPUnit passed 109 tests with 466 assertions.
 - `npm run build`: PASS on 2026-07-28; Vite built the manifest, 28.89 kB CSS, and 104.11 kB JavaScript bundles.
 - `npm run validate:build`: PASS on 2026-07-28; both production entries and CSS isolation validated.
 - `npm run package`: PASS on 2026-07-28; repeated lint, tests, build, and validation before creating the ZIP.
 - `npm audit`: PASS on 2026-07-28; 0 vulnerabilities.
 - ZIP forbidden-file audit: PASS; 52 entries under one `fancyn-plugin-starter/` root, no `vendor/`, `tools/`, Composer manifests, or source maps.
 - ZIP runtime audit: PASS; main plugin file, README, Vite manifest, project-owned `includes/Autoloader.php`, and languages directory are present.
-- ZIP PHP syntax audit: PASS; `php -l` reported 0 failures across all 43 packaged PHP files.
+- ZIP PHP syntax audit: PASS; `php -l` reported 0 failures across all 34 packaged PHP files.
 
 ## Clean WordPress procedure
 
