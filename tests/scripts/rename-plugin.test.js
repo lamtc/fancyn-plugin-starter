@@ -17,6 +17,16 @@ const metadata = {
   optionPrefix: 'example_plugin_',
   restNamespace: 'example-plugin/v1',
 };
+const brandedMetadata = {
+  pluginName: 'Fancyn Car Booking',
+  pluginSlug: 'fancyn-car-booking',
+  textDomain: 'fancyn-car-booking',
+  namespace: 'Fancyn\\CarBooking',
+  phpPrefix: 'fcb_',
+  cssPrefix: 'fcb-',
+  optionPrefix: 'fcb_',
+  restNamespace: 'fancyn-car-booking/v1',
+};
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), 'fps-rename-'));
@@ -78,6 +88,20 @@ describe('renameProject', () => {
     expect(await readFile(path.join(root, 'scripts', 'validate-build.mjs'), 'utf8')).toContain("'.ep-plugin-root'");
     expect(await readFile(path.join(root, 'tests', 'scripts', 'rename-plugin.test.js'), 'utf8')).toContain("'fancyn-plugin-starter'");
     expect(await readFile(path.join(root, 'tests', 'scripts', 'vite-build.test.js'), 'utf8')).toContain("'ep-'");
+  });
+
+  it('allows the new identity to retain the Fancyn brand and namespace root', async () => {
+    const root = await fixture();
+    await renameProject({ root, metadata: brandedMetadata });
+
+    const entry = await readFile(path.join(root, 'fancyn-car-booking.php'), 'utf8');
+    expect(entry).toContain('Fancyn Car Booking');
+    expect(entry).toContain('Fancyn\\CarBooking');
+    expect(entry).toContain('fcb_');
+    expect(entry).toContain('FCB');
+    expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.fcb-plugin-root');
+    expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('<element value="Fancyn"/>');
+    await expect(readFile(path.join(root, 'fancyn-plugin-starter.php'))).rejects.toThrow();
   });
 
   it('preserves historical superpowers documents', async () => {

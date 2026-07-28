@@ -46,7 +46,7 @@ it('allows the new identity to retain the Fancyn brand and namespace root', asyn
   expect(entry).toContain('Fancyn Car Booking');
   expect(entry).toContain('Fancyn\\CarBooking');
   expect(entry).toContain('fcb_');
-  expect(entry).toContain('FANCYN_CAR_BOOKING');
+  expect(entry).toContain('FCB');
   expect(await readFile(path.join(root, 'assets', 'src', 'admin.css'), 'utf8')).toContain('.fcb-plugin-root');
   expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('<element value="Fancyn"/>');
   await expect(readFile(path.join(root, 'fancyn-plugin-starter.php'))).rejects.toThrow();
