@@ -1,0 +1,10 @@
+{
+  "pluginName": "Fancyn Plugin Starter",
+  "pluginSlug": "fancyn-plugin-starter",
+  "textDomain": "fancyn-plugin-starter",
+  "namespace": "Fancyn\\PluginStarter",
+  "phpPrefix": "fancyn_plugin_starter_",
+  "cssPrefix": "fps-",
+  "optionPrefix": "fancyn_plugin_starter_",
+  "restNamespace": "fancyn-plugin-starter/v1"
+}
