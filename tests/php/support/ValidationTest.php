@@ -7,28 +7,21 @@
 
 namespace Fancyn\PluginStarter\Tests\Support;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Support\Validation;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /** Tests field-specific WordPress sanitization. */
-final class ValidationTest extends TestCase {
+final class ValidationTest extends WordPressTestCase {
 	/** Starts mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'sanitize_text_field' )->alias( static fn ( mixed $v ): string => trim( preg_replace( '/<[^>]*>/', '', (string) $v ) ?? '' ) );
-		Functions\when( 'sanitize_email' )->alias( static fn ( mixed $v ): string => filter_var( $v, FILTER_VALIDATE_EMAIL ) ? (string) $v : '' );
-		Functions\when( 'esc_url_raw' )->alias( static fn ( mixed $v ): string => filter_var( $v, FILTER_VALIDATE_URL ) ? (string) $v : '' );
-		Functions\when( 'absint' )->alias( static fn ( mixed $v ): int => abs( (int) $v ) );
-		Functions\when( 'sanitize_hex_color' )->alias( static fn ( mixed $v ): string => preg_match( '/^#[0-9a-fA-F]{6}$/', (string) $v ) ? (string) $v : '' );
-		Functions\when( 'wp_kses_post' )->returnArg( 1 );
+		self::stubCallback( 'sanitize_text_field', static fn ( mixed $v ): string => trim( preg_replace( '/<[^>]*>/', '', (string) $v ) ?? '' ) );
+		self::stubCallback( 'sanitize_email', static fn ( mixed $v ): string => filter_var( $v, FILTER_VALIDATE_EMAIL ) ? (string) $v : '' );
+		self::stubCallback( 'esc_url_raw', static fn ( mixed $v ): string => filter_var( $v, FILTER_VALIDATE_URL ) ? (string) $v : '' );
+		self::stubCallback( 'absint', static fn ( mixed $v ): int => abs( (int) $v ) );
+		self::stubCallback( 'sanitize_hex_color', static fn ( mixed $v ): string => preg_match( '/^#[0-9a-fA-F]{6}$/', (string) $v ) ? (string) $v : '' );
+		self::stubCallback( 'wp_kses_post', static fn ( mixed $value ): mixed => $value );
 	}
-	/** Stops mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown(); }
 
 	/** Sanitizes values by declared field type. */
 	public function test_by_type_uses_field_specific_sanitizers(): void {

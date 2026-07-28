@@ -7,29 +7,20 @@
 
 namespace Fancyn\PluginStarter\Tests\UI;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\UI\Button;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Tests button variants, sizes, and states.
  */
-final class ButtonTest extends TestCase {
+final class ButtonTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_attr' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_url' )->returnArg( 1 );
-		Functions\when( 'wp_kses' )->returnArg( 1 );
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_attr', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_url', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'wp_kses', static fn ( mixed $value ): mixed => $value );
 	}
 
 	/**

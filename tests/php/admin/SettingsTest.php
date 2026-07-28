@@ -7,42 +7,38 @@
 
 namespace Fancyn\PluginStarter\Tests\Admin;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Admin\Settings;
 use Fancyn\PluginStarter\Support\View;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /** Tests Settings API registration and schema sanitization. */
-final class SettingsTest extends TestCase {
+final class SettingsTest extends WordPressTestCase {
 	/** Starts mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( '__' )->returnArg( 1 ); }
-	/** Stops mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown(); }
+		self::stubCallback( '__', static fn ( mixed $value ): mixed => $value ); }
 
 	/** Registers one prefixed setting and section. */
 	public function test_register_settings_uses_settings_api(): void {
 		$settings = $this->make_settings();
-		Functions\expect( 'register_setting' )->once()->with( 'fancyn_plugin_starter', 'fancyn_plugin_starter_settings', \Mockery::on( static fn ( array $args ): bool => is_callable( $args['sanitize_callback'] ) ) );
-		Functions\expect( 'add_settings_section' )->once();
 		$settings->register_settings();
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'register_setting', 1 );
+		self::assertCalledTimes( 'add_settings_section', 1 );
+		$registration = self::calls( 'register_setting' )[0];
+		$this->assertSame( 'fancyn_plugin_starter', $registration[0] );
+		$this->assertSame( 'fancyn_plugin_starter_settings', $registration[1] );
+		$this->assertIsCallable( $registration[2]['sanitize_callback'] );
 	}
 
 	/** Sanitizes declared fields and ignores unknown input. */
 	public function test_sanitize_applies_schema_and_discards_unknown_fields(): void {
-		Functions\when( 'get_option' )->justReturn( array( 'company_email' => 'old@example.test' ) );
-		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
-		Functions\when( 'sanitize_email' )->alias( static fn ( string $v ): string => filter_var( $v, FILTER_VALIDATE_EMAIL ) ? $v : '' );
-		Functions\when( 'esc_url_raw' )->returnArg( 1 );
-		Functions\when( 'absint' )->alias( static fn ( mixed $v ): int => abs( (int) $v ) );
-		Functions\when( 'sanitize_hex_color' )->returnArg( 1 );
-		Functions\when( 'wp_kses_post' )->returnArg( 1 );
+		self::stub( 'get_option', array( 'company_email' => 'old@example.test' ) );
+		self::stubCallback( 'sanitize_text_field', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'sanitize_email', static fn ( string $v ): string => filter_var( $v, FILTER_VALIDATE_EMAIL ) ? $v : '' );
+		self::stubCallback( 'esc_url_raw', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'absint', static fn ( mixed $v ): int => abs( (int) $v ) );
+		self::stubCallback( 'sanitize_hex_color', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'wp_kses_post', static fn ( mixed $value ): mixed => $value );
 		$result = $this->make_settings()->sanitize(
 			array(
 				'company_name'  => 'Acme',

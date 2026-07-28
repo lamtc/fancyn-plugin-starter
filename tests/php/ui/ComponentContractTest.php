@@ -7,8 +7,6 @@
 
 namespace Fancyn\PluginStarter\Tests\UI;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\UI\Button;
 use Fancyn\PluginStarter\UI\Checkbox;
 use Fancyn\PluginStarter\UI\FormField;
@@ -20,28 +18,21 @@ use Fancyn\PluginStarter\UI\Select;
 use Fancyn\PluginStarter\UI\SwitchField;
 use Fancyn\PluginStarter\UI\Textarea;
 use Fancyn\PluginStarter\UI\ValidationMessage;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Enforces a consistent stateless renderer contract.
  */
-final class ComponentContractTest extends TestCase {
+final class ComponentContractTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_html__' )->returnArg( 1 );
-		Functions\when( 'esc_attr' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_url' )->returnArg( 1 );
-		Functions\when( 'wp_kses' )->returnArg( 1 );
-		Functions\when( 'sanitize_key' )->alias( static fn ( string $value ): string => strtolower( preg_replace( '/[^a-zA-Z0-9_-]/', '-', $value ) ?? '' ) );
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_html__', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'esc_attr', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_url', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'wp_kses', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'sanitize_key', static fn ( string $value ): string => strtolower( preg_replace( '/[^a-zA-Z0-9_-]/', '-', $value ) ?? '' ) );
 	}
 
 	/**

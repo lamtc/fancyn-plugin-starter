@@ -7,44 +7,35 @@
 
 namespace Fancyn\PluginStarter\Tests\Admin;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Admin\Assets;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Tests scoped development and production asset loading.
  */
-final class AssetsTest extends TestCase {
+final class AssetsTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html__' )->returnArg( 1 );
-		Functions\when( 'esc_html' )->returnArg( 1 );
-		Functions\when( 'trailingslashit' )->alias(
+		self::stubCallback( 'esc_html__', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback(
+			'trailingslashit',
 			static fn ( string $value ): string => rtrim( $value, '/\\' ) . '/'
 		);
-		Functions\when( 'untrailingslashit' )->alias(
+		self::stubCallback(
+			'untrailingslashit',
 			static fn ( string $value ): string => rtrim( $value, '/\\' )
 		);
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
 	}
 
 	/**
 	 * Does not enqueue outside registered hooks.
 	 */
 	public function test_skips_unrelated_admin_hooks(): void {
-		Functions\expect( 'wp_enqueue_script' )->never();
-		Functions\expect( 'wp_enqueue_style' )->never();
-
 		$this->make_assets()->enqueue( 'index.php' );
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'wp_enqueue_script', 0 );
+		self::assertCalledTimes( 'wp_enqueue_style', 0 );
 	}
 
 	/**
@@ -57,9 +48,8 @@ final class AssetsTest extends TestCase {
 			)
 		);
 
-		Functions\expect( 'wp_enqueue_script' )->never();
 		$assets->enqueue( 'toplevel_page_fancyn-plugin-starter' );
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'wp_enqueue_script', 0 );
 	}
 
 	/**
@@ -72,14 +62,13 @@ final class AssetsTest extends TestCase {
 			)
 		);
 
-		Functions\expect( 'wp_enqueue_script' )->twice();
-		Functions\expect( 'wp_script_add_data' )->twice()->with( \Mockery::type( 'string' ), 'type', 'module' );
-		Functions\expect( 'wp_enqueue_style' )
-			->once()
-			->with( 'fancyn-plugin-starter-admin', 'http://127.0.0.1:5173/assets/src/css/admin.css', array(), null );
-
 		$assets->enqueue( 'toplevel_page_fancyn-plugin-starter' );
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'wp_enqueue_script', 2 );
+		self::assertCalledTimes( 'wp_script_add_data', 2 );
+		$this->assertSame( array( 'fancyn-plugin-starter-admin', 'http://127.0.0.1:5173/assets/src/css/admin.css', array(), null ), self::calls( 'wp_enqueue_style' )[0] );
+		foreach ( self::calls( 'wp_script_add_data' ) as $call ) {
+			$this->assertSame( array( 'type', 'module' ), array_slice( $call, 1 ) );
+		}
 	}
 
 	/**
@@ -121,29 +110,18 @@ final class AssetsTest extends TestCase {
 			)
 		);
 
-		Functions\expect( 'wp_enqueue_script' )
-			->once()
-			->with(
-				'fancyn-plugin-starter-admin',
-				'https://example.test/plugin/assets/dist/assets/admin-abc.js',
-				array( 'wp-color-picker', 'wp-editor', 'media-editor', 'wp-api-fetch' ),
-				'1.0.0',
-				true
-			);
-		Functions\expect( 'wp_script_add_data' )->once();
-		Functions\expect( 'wp_enqueue_media' )->once();
-		Functions\expect( 'wp_enqueue_editor' )->once();
-		Functions\expect( 'wp_enqueue_style' )
-			->once()
-			->with(
-				'fancyn-plugin-starter-admin',
-				'https://example.test/plugin/assets/dist/assets/styles-def.css',
-				array( 'wp-color-picker' ),
-				'1.0.0'
-			);
-
 		$assets->enqueue( 'fancyn-plugin-starter_page_fancyn-plugin-starter-settings' );
-		$this->addToAssertionCount( 1 );
+		$this->assertSame(
+			array( 'fancyn-plugin-starter-admin', 'https://example.test/plugin/assets/dist/assets/admin-abc.js', array( 'wp-color-picker', 'wp-editor', 'media-editor', 'wp-api-fetch' ), '1.0.0', true ),
+			self::calls( 'wp_enqueue_script' )[0]
+		);
+		$this->assertSame(
+			array( 'fancyn-plugin-starter-admin', 'https://example.test/plugin/assets/dist/assets/styles-def.css', array( 'wp-color-picker' ), '1.0.0' ),
+			self::calls( 'wp_enqueue_style' )[0]
+		);
+		self::assertCalledTimes( 'wp_script_add_data', 1 );
+		self::assertCalledTimes( 'wp_enqueue_media', 1 );
+		self::assertCalledTimes( 'wp_enqueue_editor', 1 );
 	}
 
 	/**
@@ -159,14 +137,12 @@ final class AssetsTest extends TestCase {
 			)
 		);
 
-		Functions\expect( 'wp_enqueue_script' )->once();
-		Functions\expect( 'wp_script_add_data' )->once();
-		Functions\expect( 'wp_enqueue_media' )->once();
-		Functions\expect( 'wp_enqueue_editor' )->once();
-		Functions\expect( 'wp_enqueue_style' )->once();
-
 		$assets->enqueue( 'plugin-starter_page_fancyn-plugin-starter-settings' );
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'wp_enqueue_script', 1 );
+		self::assertCalledTimes( 'wp_script_add_data', 1 );
+		self::assertCalledTimes( 'wp_enqueue_media', 1 );
+		self::assertCalledTimes( 'wp_enqueue_editor', 1 );
+		self::assertCalledTimes( 'wp_enqueue_style', 1 );
 	}
 
 	/**
