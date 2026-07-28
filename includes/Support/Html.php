@@ -119,6 +119,41 @@ final class Html {
 	}
 
 	/**
+	 * Filters a small inline SVG icon slot.
+	 *
+	 * @param string $icon Raw SVG markup.
+	 */
+	public static function svg( string $icon ): string {
+		return wp_kses(
+			$icon,
+			array(
+				'svg'    => array(
+					'aria-hidden' => true,
+					'class'       => true,
+					'fill'        => true,
+					'height'      => true,
+					'viewbox'     => true,
+					'width'       => true,
+				),
+				'path'   => array(
+					'd'            => true,
+					'fill'         => true,
+					'stroke'       => true,
+					'stroke-width' => true,
+				),
+				'circle' => array(
+					'cx'           => true,
+					'cy'           => true,
+					'fill'         => true,
+					'r'            => true,
+					'stroke'       => true,
+					'stroke-width' => true,
+				),
+			)
+		);
+	}
+
+	/**
 	 * Determines whether an attribute name is allowlisted.
 	 *
 	 * @param string $name Attribute name.

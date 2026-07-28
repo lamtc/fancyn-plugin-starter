@@ -60,7 +60,7 @@ final class ValidationMessage {
 
 		$html = '<p' . Html::attributes( $attributes ) . '>';
 		if ( '' !== (string) $args['icon'] ) {
-			$html .= '<span class="fps-shrink-0">' . self::filter_icon( (string) $args['icon'] ) . '</span>';
+			$html .= '<span class="fps-shrink-0">' . Html::svg( (string) $args['icon'] ) . '</span>';
 		}
 
 		$html .= '<span>' . esc_html( (string) $args['message'] ) . '</span></p>';
@@ -74,32 +74,5 @@ final class ValidationMessage {
 	 */
 	public static function render( array $args ): void {
 		echo self::make( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped by make().
-	}
-
-	/**
-	 * Filters a small inline SVG slot.
-	 *
-	 * @param string $icon Raw SVG markup.
-	 */
-	private static function filter_icon( string $icon ): string {
-		return wp_kses(
-			$icon,
-			array(
-				'svg'  => array(
-					'aria-hidden' => true,
-					'class'       => true,
-					'fill'        => true,
-					'height'      => true,
-					'viewbox'     => true,
-					'width'       => true,
-				),
-				'path' => array(
-					'd'            => true,
-					'fill'         => true,
-					'stroke'       => true,
-					'stroke-width' => true,
-				),
-			)
-		);
 	}
 }
