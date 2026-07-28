@@ -6,7 +6,11 @@
 	<arg name="colors"/>
 	<arg name="extensions" value="php"/>
 	<arg value="ps"/>
-	<file>.</file>
+	<file>fancyn-plugin-starter.php</file>
+	<file>uninstall.php</file>
+	<file>includes</file>
+	<file>templates</file>
+	<file>tests</file>
 
 	<exclude-pattern>*/assets/dist/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
