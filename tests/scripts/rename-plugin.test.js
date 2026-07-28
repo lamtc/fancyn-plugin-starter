@@ -37,6 +37,7 @@ async function fixture() {
   await writeFile(path.join(root, 'assets', 'src', 'admin.css'), '.fps-plugin-root { color: red; }');
   await writeFile(path.join(root, 'docs', 'superpowers', 'history.md'), 'Fancyn Plugin Starter');
   await writeFile(path.join(root, 'scripts', 'rename-plugin.mjs'), "const starter = 'fancyn-plugin-starter';");
+  await writeFile(path.join(root, 'scripts', 'validate-build.mjs'), "const root = '.fps-plugin-root';");
   await writeFile(path.join(root, 'tests', 'scripts', 'rename-plugin.test.js'), "const starterSlug = 'fancyn-plugin-starter';");
   await writeFile(path.join(root, 'tests', 'scripts', 'vite-build.test.js'), "expect(prefix).toBe('fps-');");
   await writeFile(path.join(root, 'phpcs.xml.dist'), '<file>fancyn-plugin-starter.php</file><element value="fancyn_plugin_starter"/><element value="Fancyn"/>');
@@ -74,6 +75,7 @@ describe('renameProject', () => {
     expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('example_plugin');
     expect(await readFile(path.join(root, 'phpcs.xml.dist'), 'utf8')).toContain('Vendor');
     expect(await readFile(path.join(root, 'scripts', 'rename-plugin.mjs'), 'utf8')).toContain("'fancyn-plugin-starter'");
+    expect(await readFile(path.join(root, 'scripts', 'validate-build.mjs'), 'utf8')).toContain("'.ep-plugin-root'");
     expect(await readFile(path.join(root, 'tests', 'scripts', 'rename-plugin.test.js'), 'utf8')).toContain("'fancyn-plugin-starter'");
     expect(await readFile(path.join(root, 'tests', 'scripts', 'vite-build.test.js'), 'utf8')).toContain("'ep-'");
   });

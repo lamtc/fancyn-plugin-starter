@@ -12,8 +12,8 @@ const starter = {
   optionPrefix: 'fancyn_plugin_starter_',
   restNamespace: 'fancyn-plugin-starter/v1',
 };
-const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'scripts', 'vendor', 'docs/superpowers']);
-const excludedFiles = new Set(['tests/scripts/rename-plugin.test.js']);
+const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'vendor', 'docs/superpowers']);
+const excludedFiles = new Set(['scripts/rename-plugin.mjs', 'tests/scripts/rename-plugin.test.js']);
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mjs', '.php', '.txt', '.xml', '.yml', '.yaml']);
 const defaultFilesystem = { cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile };
 
