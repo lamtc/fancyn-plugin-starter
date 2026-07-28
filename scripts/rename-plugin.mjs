@@ -80,8 +80,8 @@ function replacements(metadata) {
     [starter.cssPrefix, metadata.cssPrefix],
     [starter.pluginSlug, metadata.pluginSlug],
     [starter.pluginName, metadata.pluginName],
-    [starterNamespaceRoot, targetNamespaceRoot],
-  ];
+    [`<element value="${starterNamespaceRoot}"/>`, `<element value="${targetNamespaceRoot}"/>`],
+  ].filter(([search, replacement]) => search !== replacement);
 }
 
 async function customizeStage(stage, metadata, filesystem) {
