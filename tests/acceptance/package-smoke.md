@@ -8,7 +8,7 @@
 - `npm run validate:build`: PASS on 2026-07-28; both production entries and CSS isolation validated.
 - `npm run package`: PASS on 2026-07-28; repeated lint, tests, build, and validation before creating the ZIP.
 - `npm audit`: PASS on 2026-07-28; 0 vulnerabilities.
-- ZIP forbidden-file audit: PASS; 81 files under one `fancyn-plugin-starter/` root, 0 forbidden paths, and no source maps.
+- ZIP forbidden-file audit: PASS; 66 entries under one `fancyn-plugin-starter/` root, 0 forbidden paths, and no source maps.
 - ZIP runtime audit: PASS; main plugin file, README, Vite manifest, production Composer autoloader, and languages directory are present.
 - ZIP PHP syntax audit: PASS; `php -l` reported 0 failures across all 43 packaged PHP files.
 
@@ -33,7 +33,7 @@
 |---|---|---|
 | WordPress version | PASS | WordPress 7.0.2 on `plugin-dev.test` |
 | PHP version | PASS | PHP 8.3.25 |
-| ZIP SHA-256 | PASS | `A86E4DEDA4B969F4B1ECCB5A21030D4FA947ADE62ED59DB1BBEA83CF524EC6B8` |
+| ZIP SHA-256 | PASS | `F043E2D65991BB94610C5A6B953460890732B1A271C5909DB868E68975D0B188` |
 | Install and activate | PASS | Final ZIP expanded to an isolated plugin directory and activated through `activate_plugin()` with no plugin warning or activation error |
 | Dashboard render | PASS | Browser returned the plugin root, production CSS/JS, module script tag, no PHP error text, and no console error |
 | Settings save | PASS | Browser submitted the Settings API form, displayed “Settings saved.”, and rendered the persisted value after redirect |

@@ -24,7 +24,8 @@ async function fixture() {
   await writeFile(path.join(root, 'scripts', 'build.mjs'), 'source');
   await writeFile(path.join(root, 'tests', 'test.php'), '<?php');
   await writeFile(path.join(root, 'package.json'), '{}');
-  await writeFile(path.join(root, '.distignore'), ['node_modules/', '.git/', '.worktrees/', 'tests/', 'scripts/', 'assets/src/', '*.map', 'package.json', 'package-lock.json', 'composer.json', 'composer.lock', 'plugin.json', '.distignore', 'build/'].join('\n'));
+  await writeFile(path.join(root, '.gitattributes'), '* text=auto eol=lf');
+  await writeFile(path.join(root, '.distignore'), ['node_modules/', '.git/', '.worktrees/', 'tests/', 'scripts/', 'assets/src/', '*.map', 'package.json', 'package-lock.json', 'composer.json', 'composer.lock', 'plugin.json', '.gitattributes', '.distignore', 'build/'].join('\n'));
   return root;
 }
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true }))));
@@ -41,6 +42,7 @@ describe('buildZip', () => {
     expect(entries.some((entry) => entry.includes('/scripts/'))).toBe(false);
     expect(entries.some((entry) => entry.includes('/assets/src/'))).toBe(false);
     expect(entries.some((entry) => entry.endsWith('/package.json'))).toBe(false);
+    expect(entries.some((entry) => entry.endsWith('/.gitattributes'))).toBe(false);
   });
 
   it('replaces an existing ZIP deterministically', async () => {
