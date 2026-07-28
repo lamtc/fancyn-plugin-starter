@@ -1,0 +1,22 @@
+@layer utilities {
+  .fps-plugin-root .fps-focus-ring:focus-visible {
+    border-color: #f4511e;
+    box-shadow: 0 0 0 3px #fff0ea;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  .fps-plugin-root .fps-scroll-safe {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fps-plugin-root *,
+  .fps-plugin-root *::before,
+  .fps-plugin-root *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
