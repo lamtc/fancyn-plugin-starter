@@ -19,6 +19,10 @@
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>includes/*</exclude-pattern>
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
 	<rule ref="PHPCompatibilityWP">
 		<properties>
 			<property name="testVersion" value="8.1-"/>
@@ -39,6 +43,7 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="fancyn_plugin_starter"/>
+				<element value="Fancyn"/>
 			</property>
 		</properties>
 	</rule>
