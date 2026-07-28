@@ -4,4 +4,3 @@
  *
  * @package Fancyn_Plugin_Starter
  */
-
