@@ -18,6 +18,8 @@ use Fancyn\PluginStarter\Admin\Assets;
 use Fancyn\PluginStarter\Admin\Menu;
 use Fancyn\PluginStarter\Admin\Settings;
 use Fancyn\PluginStarter\Support\View;
+use Fancyn\PluginStarter\Http\Ajax;
+use Fancyn\PluginStarter\Http\Rest;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,7 +56,7 @@ add_action(
 				),
 			)
 		);
-		$plugin   = new Plugin( array( new Admin( array( $settings, $menu, $assets ) ) ) );
+		$plugin   = new Plugin( array( new Admin( array( $settings, $menu, $assets ) ), new Rest(), new Ajax() ) );
 		$plugin->run();
 	}
 );
