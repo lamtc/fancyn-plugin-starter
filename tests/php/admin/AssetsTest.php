@@ -100,11 +100,13 @@ final class AssetsTest extends TestCase {
 			->with(
 				'fancyn-plugin-starter-admin',
 				'https://example.test/plugin/assets/dist/assets/admin-abc.js',
-				array( 'wp-api-fetch' ),
+				array( 'wp-color-picker', 'wp-editor', 'media-editor', 'wp-api-fetch' ),
 				'1.0.0',
 				true
 			);
 		Functions\expect( 'wp_script_add_data' )->once();
+		Functions\expect( 'wp_enqueue_media' )->once();
+		Functions\expect( 'wp_enqueue_editor' )->once();
 		Functions\expect( 'wp_enqueue_style' )
 			->once()
 			->with(

@@ -1,3 +1,8 @@
+import { initAlpine } from './alpine.js';
+import { initTextareas } from './textarea.js';
+import { initTomSelects } from './tom-select.js';
+import { initColorPickers, initMediaFields } from './wordpress-api.js';
+
 /**
  * Initializes the admin application inside the plugin root.
  *
@@ -9,6 +14,8 @@ export function initializeAdmin(documentRoot = document) {
   if (!root) return null;
   initTextareas(root);
   initTomSelects(root);
+  initMediaFields(root);
+  initColorPickers(root);
   initAlpine(documentRoot);
   return root;
 }
@@ -16,6 +23,3 @@ export function initializeAdmin(documentRoot = document) {
 if (typeof document !== 'undefined') {
   initializeAdmin();
 }
-import { initAlpine } from './alpine.js';
-import { initTextareas } from './textarea.js';
-import { initTomSelects } from './tom-select.js';

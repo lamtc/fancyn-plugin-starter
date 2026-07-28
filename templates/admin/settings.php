@@ -41,6 +41,65 @@ $fancyn_plugin_starter_fields .= SwitchField::make(
 		'checked'     => $options['enabled'],
 	)
 );
+$fancyn_plugin_starter_fields .= Input::make(
+	array(
+		'name'       => $option . '[items_per_page]',
+		'type'       => 'number',
+		'label'      => __( 'Items per page', 'fancyn-plugin-starter' ),
+		'value'      => $options['items_per_page'],
+		'attributes' => array(
+			'min' => 1,
+			'max' => 100,
+		),
+	)
+);
+$fancyn_plugin_starter_fields .= Input::make(
+	array(
+		'name'       => $option . '[brand_color]',
+		'label'      => __( 'Brand color', 'fancyn-plugin-starter' ),
+		'value'      => $options['brand_color'],
+		'attributes' => array( 'data-color-picker' => '1' ),
+	)
+);
+$fancyn_plugin_starter_fields .= '<div class="fps-space-y-2" data-media-field data-media-type="image">';
+$fancyn_plugin_starter_fields .= '<p class="fps-text-sm fps-font-semibold fps-text-ink">' . esc_html__( 'Company logo', 'fancyn-plugin-starter' ) . '</p>';
+$fancyn_plugin_starter_fields .= Input::make(
+	array(
+		'type'       => 'hidden',
+		'name'       => $option . '[logo_id]',
+		'value'      => $options['logo_id'],
+		'attributes' => array( 'data-media-id' => '1' ),
+	)
+);
+$fancyn_plugin_starter_fields .= '<img class="fps-h-24 fps-w-24 fps-rounded-control fps-border fps-border-line fps-object-cover" data-media-preview src="' . esc_url( (string) $logo_url ) . '" alt=""' . ( $logo_url ? '' : ' hidden' ) . '>';
+$fancyn_plugin_starter_fields .= '<div class="fps-flex fps-gap-2">';
+$fancyn_plugin_starter_fields .= Button::make(
+	array(
+		'variant'    => 'outline',
+		'text'       => __( 'Select image', 'fancyn-plugin-starter' ),
+		'attributes' => array( 'data-media-select' => '1' ),
+	)
+);
+$fancyn_plugin_starter_fields .= Button::make(
+	array(
+		'variant'    => 'ghost',
+		'text'       => __( 'Remove image', 'fancyn-plugin-starter' ),
+		'attributes' => array( 'data-media-remove' => '1' ),
+	)
+);
+$fancyn_plugin_starter_fields .= '</div></div>';
+
+ob_start();
+wp_editor(
+	(string) $options['content'],
+	'fancyn_plugin_starter_content',
+	array(
+		'textarea_name' => $option . '[content]',
+		'textarea_rows' => 8,
+	)
+);
+$fancyn_plugin_starter_editor  = (string) ob_get_clean();
+$fancyn_plugin_starter_fields .= '<div class="fps-space-y-2"><p class="fps-text-sm fps-font-semibold fps-text-ink">' . esc_html__( 'Rich text content', 'fancyn-plugin-starter' ) . '</p>' . $fancyn_plugin_starter_editor . '</div>';
 ?>
 <div id="fancyn-plugin-starter-app" class="fps-plugin-root fps-min-h-screen fps-bg-surface-page fps-p-4 md:fps-p-6">
 	<div class="fps-mx-auto fps-max-w-7xl fps-space-y-6">

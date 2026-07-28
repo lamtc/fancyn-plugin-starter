@@ -108,9 +108,10 @@ final class Settings implements ServiceProvider {
 		$this->view->render(
 			'admin/settings',
 			array(
-				'options' => is_array( $options ) ? array_merge( $this->defaults(), $options ) : $this->defaults(),
-				'group'   => self::GROUP,
-				'option'  => self::OPTION,
+				'options'  => is_array( $options ) ? array_merge( $this->defaults(), $options ) : $this->defaults(),
+				'group'    => self::GROUP,
+				'option'   => self::OPTION,
+				'logo_url' => ! empty( $options['logo_id'] ) ? wp_get_attachment_image_url( (int) $options['logo_id'], 'medium' ) : '',
 			)
 		);
 	}

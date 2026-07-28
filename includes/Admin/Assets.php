@@ -120,6 +120,10 @@ final class Assets implements ServiceProvider {
 		if ( '' === $screen_id || ! str_contains( $screen_id, 'fancyn-plugin-starter' ) ) {
 			return;
 		}
+		if ( str_ends_with( $hook_suffix, '-settings' ) ) {
+			wp_enqueue_media();
+			wp_enqueue_editor();
+		}
 
 		if ( ( $this->dev_server_available )() ) {
 			$this->enqueue_development_assets();
@@ -210,7 +214,7 @@ final class Assets implements ServiceProvider {
 	private function dependencies_for( string $hook_suffix ): array {
 		if ( str_ends_with( $hook_suffix, '-settings' ) ) {
 			return array(
-				'scripts' => array( 'wp-api-fetch' ),
+				'scripts' => array( 'wp-color-picker', 'wp-editor', 'media-editor', 'wp-api-fetch' ),
 				'styles'  => array( 'wp-color-picker' ),
 			);
 		}

@@ -41,4 +41,21 @@
     border-radius: 8px;
     color: #5f5f5b;
   }
+
+  .fps-plugin-root .wp-picker-container,
+  .fps-plugin-root .wp-editor-wrap {
+    max-width: 100%;
+  }
+
+  .fps-plugin-root .wp-picker-container .wp-color-result.button {
+    min-height: 32px;
+    border-color: #e2e2df;
+    border-radius: 8px;
+  }
+
+  .fps-plugin-root .wp-editor-container {
+    overflow: hidden;
+    border-color: #e2e2df;
+    border-radius: 10px;
+  }
 }
