@@ -83,6 +83,32 @@ final class AssetsTest extends TestCase {
 	}
 
 	/**
+	 * Renders Vite entries as modules so their symbols cannot leak globally.
+	 */
+	public function test_marks_plugin_scripts_as_modules(): void {
+		$assets = $this->make_assets();
+
+		// phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Raw tags are fixtures for the script_loader_tag filter.
+		$this->assertSame(
+			'<script type="module" src="admin.js"></script>',
+			$assets->mark_script_as_module(
+				'<script src="admin.js"></script>',
+				'fancyn-plugin-starter-admin',
+				'admin.js'
+			)
+		);
+		$this->assertSame(
+			'<script src="underscore.js"></script>',
+			$assets->mark_script_as_module(
+				'<script src="underscore.js"></script>',
+				'underscore',
+				'underscore.js'
+			)
+		);
+		// phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedScript
+	}
+
+	/**
 	 * Resolves hashed files and page-specific WordPress dependencies.
 	 */
 	public function test_enqueues_manifest_assets_and_settings_dependencies(): void {
@@ -117,6 +143,29 @@ final class AssetsTest extends TestCase {
 			);
 
 		$assets->enqueue( 'fancyn-plugin-starter_page_fancyn-plugin-starter-settings' );
+		$this->addToAssertionCount( 1 );
+	}
+
+	/**
+	 * Accepts the settings page when WordPress derives a different parent prefix.
+	 */
+	public function test_accepts_settings_hook_with_wordpress_parent_prefix(): void {
+		$assets = $this->make_assets(
+			array(
+				'manifest' => static fn (): array => array(
+					'assets/src/js/admin.js'   => array( 'file' => 'assets/admin-abc.js' ),
+					'assets/src/css/admin.css' => array( 'file' => 'assets/styles-def.css' ),
+				),
+			)
+		);
+
+		Functions\expect( 'wp_enqueue_script' )->once();
+		Functions\expect( 'wp_script_add_data' )->once();
+		Functions\expect( 'wp_enqueue_media' )->once();
+		Functions\expect( 'wp_enqueue_editor' )->once();
+		Functions\expect( 'wp_enqueue_style' )->once();
+
+		$assets->enqueue( 'plugin-starter_page_fancyn-plugin-starter-settings' );
 		$this->addToAssertionCount( 1 );
 	}
 

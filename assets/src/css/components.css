@@ -1,4 +1,13 @@
 @layer components {
+  .fps-plugin-root [class*="fps-"] {
+    box-sizing: border-box;
+  }
+
+  .fps-plugin-root [class~="fps-w-full"] {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
   .fps-plugin-root [x-cloak] {
     display: none !important;
   }
@@ -11,6 +20,7 @@
   }
 
   .fps-plugin-root .ts-wrapper {
+    box-sizing: border-box;
     font-size: 14px;
   }
 

@@ -9,6 +9,7 @@
 /build/
 /coverage/
 /artifacts/
+/.playwright-cli/
 /.phpunit.cache/
 
 # Local environment files.

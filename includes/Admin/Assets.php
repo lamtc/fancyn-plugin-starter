@@ -99,6 +99,7 @@ final class Assets implements ServiceProvider {
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_action( 'admin_notices', array( $this, 'render_build_notice' ) );
+		add_filter( 'script_loader_tag', array( $this, 'mark_script_as_module' ), 10, 3 );
 	}
 
 	/**
@@ -112,7 +113,7 @@ final class Assets implements ServiceProvider {
 	 * @param string $hook_suffix Current admin page hook suffix.
 	 */
 	public function enqueue( string $hook_suffix ): void {
-		if ( ! in_array( $hook_suffix, $this->allowed_hooks, true ) ) {
+		if ( ! $this->is_allowed_hook( $hook_suffix ) ) {
 			return;
 		}
 
@@ -138,6 +139,29 @@ final class Assets implements ServiceProvider {
 	 */
 	public function has_build_error(): bool {
 		return $this->build_error;
+	}
+
+	/**
+	 * Adds the module type to Vite script tags.
+	 *
+	 * WordPress does not render arbitrary script data such as `type=module` on
+	 * classic enqueued scripts. Applying it at the tag boundary keeps bundled
+	 * symbols out of the global scope while retaining classic WP dependencies.
+	 *
+	 * @param string $tag    Complete script tag.
+	 * @param string $handle Registered script handle.
+	 * @param string $src    Script source URL.
+	 */
+	public function mark_script_as_module( string $tag, string $handle, string $src ): string {
+		unset( $src );
+
+		if ( ! in_array( $handle, array( 'fancyn-plugin-starter-vite-client', 'fancyn-plugin-starter-admin' ), true ) ) {
+			return $tag;
+		}
+
+		$module_tag = preg_replace( '/<script\b(?![^>]*\btype=)/', '<script type="module"', $tag, 1 );
+
+		return is_string( $module_tag ) ? $module_tag : $tag;
 	}
 
 	/**
@@ -233,6 +257,23 @@ final class Assets implements ServiceProvider {
 	private function uses_wordpress_integrations( string $hook_suffix ): bool {
 		return str_ends_with( $hook_suffix, '-settings' )
 			|| str_ends_with( $hook_suffix, '-components' );
+	}
+
+	/**
+	 * Checks exact hooks and submenu hooks with a WordPress-derived parent prefix.
+	 *
+	 * The prefix before `_page_` is derived from the registered parent menu and
+	 * can differ from the plugin slug across WordPress environments.
+	 *
+	 * @param string $hook_suffix Current admin page hook suffix.
+	 */
+	private function is_allowed_hook( string $hook_suffix ): bool {
+		if ( in_array( $hook_suffix, $this->allowed_hooks, true ) ) {
+			return true;
+		}
+
+		return str_ends_with( $hook_suffix, '_page_fancyn-plugin-starter-settings' )
+			|| str_ends_with( $hook_suffix, '_page_fancyn-plugin-starter-components' );
 	}
 
 	/**

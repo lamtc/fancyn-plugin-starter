@@ -27,9 +27,20 @@ export function validateCssIsolation(css) {
       if (parent.type === 'atrule' && /keyframes$/i.test(parent.name)) return;
       parent = parent.parent;
     }
+    const hasPreflightDeclarations = (rule.nodes ?? []).some((node) => (
+      node.type === 'decl' && /^(?:box-sizing|border-width|border-style|border-color)$/.test(node.prop)
+    ));
+
     for (const selector of rule.selectors ?? []) {
       const normalized = selector.trim();
-      if (!normalized.startsWith('.fps-plugin-root')) failures.push(`Unscoped CSS selector found: ${normalized}`);
+      const isRooted = /^\.fps-plugin-root(?=$|[\s>+~.#:[\]])/.test(normalized);
+      if (!isRooted) failures.push(`Unscoped CSS selector found: ${normalized}`);
+      if (hasPreflightDeclarations && /^\.fps-plugin-root\s+(?:\*|:{1,2}before|:{1,2}after|::backdrop)$/.test(normalized)) {
+        failures.push(`Tailwind Preflight selector found: ${normalized}`);
+      }
+      if (/^\.fps-plugin-root(?:\s+|>\s*)(?:\.wp-admin|\.wp-core-ui|#wpwrap|#wpcontent|#wpbody(?:-content)?)(?:\b|[\s>+~.#:[\]])/.test(normalized)) {
+        failures.push(`Global WordPress selector found: ${normalized}`);
+      }
       if (/\.fps-(?!plugin-root\b)[\w\\-]+/.test(normalized)) hasPrefixedUtility = true;
     }
   });
