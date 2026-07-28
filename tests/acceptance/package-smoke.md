@@ -33,7 +33,7 @@
 |---|---|---|
 | WordPress version | PASS | WordPress 7.0.2 on `plugin-dev.test` |
 | PHP version | PASS | PHP 8.3.25 |
-| ZIP SHA-256 | PASS | `49732B881ADBE8CAC566F130AC852693C18733D7C1FD972775D921CA3D8EE0F8` |
+| ZIP SHA-256 | PASS | `A86E4DEDA4B969F4B1ECCB5A21030D4FA947ADE62ED59DB1BBEA83CF524EC6B8` |
 | Install and activate | PASS | Final ZIP expanded to an isolated plugin directory and activated through `activate_plugin()` with no plugin warning or activation error |
 | Dashboard render | PASS | Browser returned the plugin root, production CSS/JS, module script tag, no PHP error text, and no console error |
 | Settings save | PASS | Browser submitted the Settings API form, displayed “Settings saved.”, and rendered the persisted value after redirect |
