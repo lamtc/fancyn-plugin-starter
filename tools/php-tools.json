@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "php": ">=8.1",
+  "tools": [
+    { "name": "phpunit", "version": "10.5.64", "type": "phar", "target": "phpunit.phar", "url": "https://phar.phpunit.de/phpunit-10.5.64.phar", "sha256": "a823d916151f628dd9943ccc81a98bcfbba9c5babf53f27be6c7dccc89f8ee23" },
+    { "name": "phpcs", "version": "3.13.5", "type": "archive", "target": "phpcs", "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer/archive/refs/tags/3.13.5.zip", "sha256": "7684dbac53b9acb362829cb4db5d6da94ccc20fc65c6571a2281cdbc50721880" },
+    { "name": "wpcs", "version": "3.4.1", "type": "archive", "target": "wpcs", "url": "https://github.com/WordPress/WordPress-Coding-Standards/archive/refs/tags/3.4.1.zip", "sha256": "18314ef61be2021597ac7526482586a5791407fb73555c26022708efedd2e867" },
+    { "name": "phpcsutils", "version": "1.2.3", "type": "archive", "target": "phpcsutils", "url": "https://github.com/PHPCSStandards/PHPCSUtils/archive/refs/tags/1.2.3.zip", "sha256": "b6fbddc95dcd0a69f8a29d54f0b4215ec545afa47434700a9ccccf8e629256c6" },
+    { "name": "phpcsextra", "version": "1.5.1", "type": "archive", "target": "phpcsextra", "url": "https://github.com/PHPCSStandards/PHPCSExtra/archive/refs/tags/1.5.1.zip", "sha256": "9ef938ab26605e5fb2a84bfc6a7caf9cb03713625ccdded6305739a02d89f6b2" },
+    { "name": "phpcompatibility", "version": "9.3.5", "type": "archive", "target": "phpcompatibility", "url": "https://github.com/PHPCompatibility/PHPCompatibility/archive/refs/tags/9.3.5.zip", "sha256": "e82b45aa4b80e118298da59328bcb51135fdbf4d9d6668bc9a672c810605c4b5" },
+    { "name": "phpcompatibility-paragonie", "version": "1.3.4", "type": "archive", "target": "phpcompatibility-paragonie", "url": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie/archive/refs/tags/1.3.4.zip", "sha256": "90497071f4886614d0c2cf017e78f84a0e5ed4492a88204fe6ec0466b4211df1" },
+    { "name": "phpcompatibility-wp", "version": "2.1.8", "type": "archive", "target": "phpcompatibility-wp", "url": "https://github.com/PHPCompatibility/PHPCompatibilityWP/archive/refs/tags/2.1.8.zip", "sha256": "247707753baa7507c29be7b2b4116e0c3a52acdb2d6e454fa594bdbe2220412b" }
+  ]
+}

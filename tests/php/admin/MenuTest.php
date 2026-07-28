@@ -7,42 +7,39 @@
 
 namespace Fancyn\PluginStarter\Tests\Admin;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Admin\Menu;
 use Fancyn\PluginStarter\Admin\Settings;
 use Fancyn\PluginStarter\Support\View;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /** Tests capability and development-only menu registration. */
-final class MenuTest extends TestCase {
+final class MenuTest extends WordPressTestCase {
 	/** Starts mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( '__' )->returnArg( 1 ); }
-	/** Stops mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown(); }
+		self::stubCallback( '__', static fn ( mixed $value ): mixed => $value ); }
 
 	/** Registers dashboard and settings with manage_options. */
 	public function test_register_menu_uses_capability_and_captures_hooks(): void {
-		Functions\expect( 'add_menu_page' )->once()->with( \Mockery::any(), \Mockery::any(), 'manage_options', 'fancyn-plugin-starter', \Mockery::type( 'callable' ), \Mockery::any(), \Mockery::any() )->andReturn( 'toplevel_page_fancyn-plugin-starter' );
-		Functions\expect( 'add_submenu_page' )->twice()->andReturn( 'fancyn-plugin-starter_page_fancyn-plugin-starter-settings' );
+		self::stub( 'add_menu_page', 'toplevel_page_fancyn-plugin-starter' );
+		self::stub( 'add_submenu_page', 'fancyn-plugin-starter_page_fancyn-plugin-starter-settings' );
 		$menu = $this->make_menu( false );
 		$menu->register_menu();
 		$this->assertContains( 'toplevel_page_fancyn-plugin-starter', $menu->hooks() );
+		$this->assertSame( 'manage_options', self::calls( 'add_menu_page' )[0][2] );
+		self::assertCalledTimes( 'add_submenu_page', 2 );
 	}
 
 	/** Registers component showcase under Tools only in development mode. */
 	public function test_showcase_registration_is_development_only(): void {
-		Functions\expect( 'add_menu_page' )->twice()->andReturn( 'top' );
-		Functions\expect( 'add_submenu_page' )->times( 4 )->andReturn( 'sub' );
-		Functions\expect( 'add_management_page' )->once()->andReturn( 'tools_page_fancyn-plugin-starter-components' );
+		self::stub( 'add_menu_page', 'top' );
+		self::stub( 'add_submenu_page', 'sub' );
+		self::stub( 'add_management_page', 'tools_page_fancyn-plugin-starter-components' );
 		$this->make_menu( false )->register_menu();
 		$this->make_menu( true )->register_menu();
-		$this->addToAssertionCount( 1 );
+		self::assertCalledTimes( 'add_menu_page', 2 );
+		self::assertCalledTimes( 'add_submenu_page', 4 );
+		self::assertCalledTimes( 'add_management_page', 1 );
 	}
 
 	/**

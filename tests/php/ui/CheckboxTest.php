@@ -7,23 +7,16 @@
 
 namespace Fancyn\PluginStarter\Tests\UI;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\UI\Checkbox;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /** Tests native checkbox states. */
-final class CheckboxTest extends TestCase {
+final class CheckboxTest extends WordPressTestCase {
 	/** Starts mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_attr' )->alias( 'htmlspecialchars' ); }
-	/** Stops mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown(); }
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_attr', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) ); }
 
 	/** Renders label, description, checked, disabled, and indeterminate states. */
 	public function test_make_renders_native_states(): void {

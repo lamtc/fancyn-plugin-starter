@@ -32,7 +32,13 @@ if ( ! defined( 'FANCYN_PLUGIN_STARTER_DEV_MODE' ) ) {
 	define( 'FANCYN_PLUGIN_STARTER_DEV_MODE', false );
 }
 
-require_once FANCYN_PLUGIN_STARTER_PATH . 'vendor/autoload.php';
+require_once FANCYN_PLUGIN_STARTER_PATH . 'includes/Autoloader.php';
+
+$fancyn_plugin_starter_autoloader = new Fancyn\PluginStarter\Autoloader(
+	'Fancyn\\PluginStarter',
+	FANCYN_PLUGIN_STARTER_PATH . 'includes'
+);
+$fancyn_plugin_starter_autoloader->register();
 
 register_activation_hook( __FILE__, array( Activator::class, 'activate' ) );
 register_deactivation_hook( __FILE__, array( Deactivator::class, 'deactivate' ) );

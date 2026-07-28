@@ -13,6 +13,43 @@ async function findMaps(directory) {
   return maps;
 }
 
+async function exists(target) {
+  return access(target).then(() => true).catch(() => false);
+}
+
+async function phpFiles(directory) {
+  if (!await exists(directory)) return [];
+  const found = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const target = path.join(directory, entry.name);
+    if (entry.isDirectory()) found.push(...await phpFiles(target));
+    else if (entry.isFile() && entry.name.endsWith('.php')) found.push(target);
+  }
+  return found;
+}
+
+export async function validateNpmOnlySource(root = process.cwd()) {
+  const projectRoot = path.resolve(root);
+  for (const forbidden of ['composer.json', 'composer.lock', 'vendor']) {
+    if (await exists(path.join(projectRoot, forbidden))) {
+      throw new Error(`${forbidden} is forbidden because this project is npm-only.`);
+    }
+  }
+
+  const rootPhpFiles = (await readdir(projectRoot, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.php'))
+    .map((entry) => path.join(projectRoot, entry.name));
+  const runtimeFiles = [...rootPhpFiles, ...await phpFiles(path.join(projectRoot, 'includes'))];
+  for (const file of runtimeFiles) {
+    if (!await exists(file)) continue;
+    const source = await readFile(file, 'utf8');
+    if (/vendor[\\/]autoload\.php|composer/i.test(source)) {
+      throw new Error(`${path.relative(projectRoot, file)} references Composer or vendor/autoload.php; this project is npm-only.`);
+    }
+  }
+  return true;
+}
+
 export function validateCssIsolation(css) {
   const failures = [];
   let hasPrefixedUtility = false;
@@ -51,6 +88,7 @@ export function validateCssIsolation(css) {
 
 export async function validateBuild(root = process.cwd()) {
   const projectRoot = path.resolve(root);
+  await validateNpmOnlySource(projectRoot);
   const distribution = path.join(projectRoot, 'assets', 'dist');
   const manifestPath = path.join(distribution, '.vite', 'manifest.json');
   let manifest;

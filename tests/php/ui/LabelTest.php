@@ -7,28 +7,19 @@
 
 namespace Fancyn\PluginStarter\Tests\UI;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\UI\Label;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Tests accessible label rendering.
  */
-final class LabelTest extends TestCase {
+final class LabelTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_attr' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_html__' )->returnArg( 1 );
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_attr', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_html__', static fn ( mixed $value ): mixed => $value );
 	}
 
 	/**

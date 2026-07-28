@@ -1,8 +1,12 @@
 .worktrees/
 
 # PHP and JavaScript dependencies.
-/vendor/
 /node_modules/
+/tools/*/
+/tools/.staging/
+/tools/.phpcs-cache
+/tools/phpcs-installed-paths.json
+!/tools/php-tools.json
 
 # Generated assets and reports.
 /assets/dist/

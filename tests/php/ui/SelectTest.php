@@ -7,27 +7,20 @@
 
 namespace Fancyn\PluginStarter\Tests\UI;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\UI\Select;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /** Tests native and enhanced select rendering. */
-final class SelectTest extends TestCase {
+final class SelectTest extends WordPressTestCase {
 	/** Starts mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->alias( 'htmlspecialchars' );
-		Functions\when( 'esc_html__' )->returnArg( 1 );
-		Functions\when( 'esc_attr' )->alias( 'htmlspecialchars' );
-		Functions\when( 'wp_kses' )->returnArg( 1 );
-		Functions\when( 'sanitize_key' )->alias( static fn ( string $value ): string => strtolower( preg_replace( '/[^a-zA-Z0-9_-]/', '-', $value ) ?? '' ) );
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'esc_html__', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'esc_attr', static fn ( mixed $value ): string => htmlspecialchars( (string) $value ) );
+		self::stubCallback( 'wp_kses', static fn ( mixed $value ): mixed => $value );
+		self::stubCallback( 'sanitize_key', static fn ( string $value ): string => strtolower( preg_replace( '/[^a-zA-Z0-9_-]/', '-', $value ) ?? '' ) );
 	}
-	/** Stops mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown(); }
 
 	/** Renders placeholder, scalar options, optgroups, and selection. */
 	public function test_make_renders_native_option_structures(): void {

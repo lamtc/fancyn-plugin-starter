@@ -7,27 +7,18 @@
 
 namespace Fancyn\PluginStarter\Tests\Support;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Support\View;
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Tests constrained PHP template rendering.
  */
-final class ViewTest extends TestCase {
+final class ViewTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_html' )->returnArg( 1 );
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
+		self::stubCallback( 'esc_html', static fn ( mixed $value ): mixed => $value );
 	}
 
 	/**

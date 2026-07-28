@@ -8,6 +8,7 @@ export default [
       'build/**',
       'coverage/**',
       'node_modules/**',
+      'tools/**',
       'vendor/**',
     ],
   },

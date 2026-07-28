@@ -12,10 +12,26 @@ const starter = {
   optionPrefix: 'fancyn_plugin_starter_',
   restNamespace: 'fancyn-plugin-starter/v1',
 };
-const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'build', 'coverage', 'node_modules', 'vendor', 'docs/superpowers']);
+const excludedDirectories = new Set(['.git', '.worktrees', 'assets/dist', 'artifacts', 'build', 'coverage', 'node_modules', 'vendor', 'docs/superpowers']);
+const excludedFiles = new Set(['scripts/rename-plugin.mjs', 'tests/scripts/rename-plugin.test.js']);
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mjs', '.php', '.txt', '.xml', '.yml', '.yaml']);
+const defaultFilesystem = { cp, mkdir, readFile, readdir, rename, rm, unlink, writeFile };
 
-function validate(metadata) {
+export function deriveMetadata(input) {
+  return {
+    pluginName: input.pluginName,
+    pluginSlug: input.pluginSlug,
+    textDomain: input.pluginSlug,
+    namespace: input.namespace,
+    phpPrefix: input.phpPrefix,
+    cssPrefix: input.cssPrefix,
+    optionPrefix: input.phpPrefix,
+    restNamespace: `${input.pluginSlug}/v1`,
+    mainFilename: `${input.pluginSlug}.php`,
+  };
+}
+
+export function validateMetadata(metadata) {
   const keys = Object.keys(starter);
   for (const key of keys) {
     if (typeof metadata[key] !== 'string' || !metadata[key].trim()) throw new Error(`Invalid ${key}: a non-empty string is required.`);
@@ -32,18 +48,18 @@ function validate(metadata) {
 
 function ignored(relativePath) {
   const normalized = relativePath.split(path.sep).join('/');
-  return [...excludedDirectories].some((directory) => normalized === directory || normalized.startsWith(`${directory}/`));
+  return excludedFiles.has(normalized) || [...excludedDirectories].some((directory) => normalized === directory || normalized.startsWith(`${directory}/`));
 }
 
-async function files(root, relative = '') {
+async function files(root, relative = '', filesystem = defaultFilesystem) {
   const directory = path.join(root, relative);
-  const entries = await readdir(directory, { withFileTypes: true });
+  const entries = await filesystem.readdir(directory, { withFileTypes: true });
   const found = [];
   for (const entry of entries) {
     const child = path.join(relative, entry.name);
     if (ignored(child)) continue;
-    if (entry.isDirectory()) found.push(...await files(root, child));
-    else if (entry.isFile() && textExtensions.has(path.extname(entry.name).toLowerCase())) found.push(child);
+    if (entry.isDirectory()) found.push(...await files(root, child, filesystem));
+    else if (entry.isFile() && (textExtensions.has(path.extname(entry.name).toLowerCase()) || /\.(?:php|xml)\.dist$/i.test(entry.name))) found.push(child);
   }
   return found;
 }
@@ -51,55 +67,101 @@ async function files(root, relative = '') {
 function replacements(metadata) {
   const starterConstant = starter.phpPrefix.replace(/_+$/, '').toUpperCase();
   const targetConstant = metadata.phpPrefix.replace(/_+$/, '').toUpperCase();
+  const starterPrefix = starter.phpPrefix.replace(/_+$/, '');
+  const targetPrefix = metadata.phpPrefix.replace(/_+$/, '');
+  const starterNamespaceRoot = starter.namespace.split('\\')[0];
+  const targetNamespaceRoot = metadata.namespace.split('\\')[0];
   return [
+    [starter.namespace.replaceAll('\\', '\\\\'), metadata.namespace.replaceAll('\\', '\\\\')],
     [starter.namespace, metadata.namespace],
     [starterConstant, targetConstant],
     [starter.phpPrefix, metadata.phpPrefix],
+    [starterPrefix, targetPrefix],
     [starter.cssPrefix, metadata.cssPrefix],
     [starter.pluginSlug, metadata.pluginSlug],
     [starter.pluginName, metadata.pluginName],
+    [starterNamespaceRoot, targetNamespaceRoot],
   ];
 }
 
-async function customizeStage(stage, metadata) {
-  const replacementPairs = replacements(metadata);
-  for (const relative of await files(stage)) {
-    const fullPath = path.join(stage, relative);
-    let contents = await readFile(fullPath, 'utf8');
-    for (const [search, replacement] of replacementPairs) contents = contents.split(search).join(replacement);
-    await writeFile(fullPath, contents);
+async function customizeStage(stage, metadata, filesystem) {
+  for (const forbidden of ['composer.json', 'composer.lock', path.join('vendor', 'autoload.php')]) {
+    const exists = await filesystem.readFile(path.join(stage, forbidden)).then(() => true).catch(() => false);
+    if (exists) throw new Error(`npm-only project contains forbidden Composer remnant: ${forbidden.split(path.sep).join('/')}`);
   }
-  await writeFile(path.join(stage, 'plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  const replacementPairs = replacements(metadata);
+  for (const relative of await files(stage, '', filesystem)) {
+    const fullPath = path.join(stage, relative);
+    let contents = await filesystem.readFile(fullPath, 'utf8');
+    for (const [search, replacement] of replacementPairs) contents = contents.split(search).join(replacement);
+    await filesystem.writeFile(fullPath, contents);
+  }
+  await filesystem.writeFile(path.join(stage, 'plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
   const oldEntry = path.join(stage, `${starter.pluginSlug}.php`);
   const newEntry = path.join(stage, `${metadata.pluginSlug}.php`);
-  if (oldEntry !== newEntry) await rename(oldEntry, newEntry);
+  if (oldEntry !== newEntry) await filesystem.rename(oldEntry, newEntry);
 
   const remaining = [];
-  for (const relative of await files(stage)) {
-    const contents = await readFile(path.join(stage, relative), 'utf8');
+  for (const relative of await files(stage, '', filesystem)) {
+    const contents = await filesystem.readFile(path.join(stage, relative), 'utf8');
     if (replacements(starter).some(([token]) => contents.includes(token))) remaining.push(relative);
   }
   if (remaining.length) throw new Error(`Starter placeholders remain in: ${remaining.join(', ')}`);
 }
 
-async function applyStage(stage, root, metadata) {
-  for (const relative of await files(stage)) {
-    const target = path.join(root, relative);
-    await mkdir(path.dirname(target), { recursive: true });
-    await cp(path.join(stage, relative), target, { force: true });
-  }
-  if (metadata.pluginSlug !== starter.pluginSlug) {
-    await unlink(path.join(root, `${starter.pluginSlug}.php`)).catch((error) => {
-      if (error.code !== 'ENOENT') throw error;
-    });
+async function applyStage(stage, root, metadata, filesystem) {
+  const stagedFiles = await files(stage, '', filesystem);
+  const oldEntryRelative = `${starter.pluginSlug}.php`;
+  const targets = [...new Set([...stagedFiles, ...(metadata.pluginSlug !== starter.pluginSlug ? [oldEntryRelative] : [])])];
+  const rollback = `${stage}-rollback`;
+  const records = [];
+
+  try {
+    await filesystem.mkdir(rollback, { recursive: true });
+    for (const relative of targets) {
+      const target = path.join(root, relative);
+      const existed = await filesystem.readFile(target).then(() => true).catch(() => false);
+      records.push({ relative, existed });
+      if (existed) {
+        const backup = path.join(rollback, relative);
+        await filesystem.mkdir(path.dirname(backup), { recursive: true });
+        await filesystem.cp(target, backup, { force: true });
+      }
+    }
+
+    for (const relative of stagedFiles) {
+      const target = path.join(root, relative);
+      await filesystem.mkdir(path.dirname(target), { recursive: true });
+      await filesystem.cp(path.join(stage, relative), target, { force: true });
+    }
+    if (metadata.pluginSlug !== starter.pluginSlug) {
+      await filesystem.unlink(path.join(root, oldEntryRelative)).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      });
+    }
+  } catch (error) {
+    for (const record of records) {
+      const target = path.join(root, record.relative);
+      if (record.existed) {
+        await filesystem.mkdir(path.dirname(target), { recursive: true });
+        await filesystem.cp(path.join(rollback, record.relative), target, { force: true });
+      } else {
+        await filesystem.unlink(target).catch((unlinkError) => {
+          if (unlinkError.code !== 'ENOENT') throw unlinkError;
+        });
+      }
+    }
+    throw error;
+  } finally {
+    await filesystem.rm(rollback, { recursive: true, force: true });
   }
 }
 
-export async function renameProject({ root, metadata }) {
+export async function renameProject({ root, metadata, filesystem = defaultFilesystem }) {
   const projectRoot = path.resolve(root);
-  const desired = validate(metadata);
-  const current = JSON.parse(await readFile(path.join(projectRoot, 'plugin.json'), 'utf8'));
-  const oldEntryExists = await readFile(path.join(projectRoot, `${starter.pluginSlug}.php`), 'utf8').then(() => true).catch(() => false);
+  const desired = validateMetadata(metadata);
+  const current = JSON.parse(await filesystem.readFile(path.join(projectRoot, 'plugin.json'), 'utf8'));
+  const oldEntryExists = await filesystem.readFile(path.join(projectRoot, `${starter.pluginSlug}.php`), 'utf8').then(() => true).catch(() => false);
   if (!oldEntryExists) {
     if (JSON.stringify(current) === JSON.stringify(desired)) return false;
     throw new Error('Project is already customized; a second rename with different metadata is not allowed.');
@@ -107,18 +169,18 @@ export async function renameProject({ root, metadata }) {
 
   const stage = path.join(path.dirname(projectRoot), `.${path.basename(projectRoot)}-rename-${Date.now()}`);
   try {
-    await cp(projectRoot, stage, {
+    await filesystem.cp(projectRoot, stage, {
       recursive: true,
       filter: (source) => {
         const relative = path.relative(projectRoot, source);
         return !relative || !ignored(relative);
       },
     });
-    await customizeStage(stage, desired);
-    await applyStage(stage, projectRoot, desired);
+    await customizeStage(stage, desired, filesystem);
+    await applyStage(stage, projectRoot, desired, filesystem);
     return true;
   } finally {
-    await rm(stage, { recursive: true, force: true });
+    await filesystem.rm(stage, { recursive: true, force: true });
   }
 }
 

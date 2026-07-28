@@ -7,28 +7,20 @@
 
 namespace Fancyn\PluginStarter\Tests\Support;
 
-use Brain\Monkey;
-use Brain\Monkey\Functions;
 use Fancyn\PluginStarter\Support\Html;
-use PHPUnit\Framework\TestCase;
+use Fancyn\PluginStarter\Tests\Support\WordPressTestCase;
 
 /**
  * Tests safe HTML attribute serialization.
  */
-final class HtmlTest extends TestCase {
+final class HtmlTest extends WordPressTestCase {
 	/** Starts WordPress function mocks. */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
-		Functions\when( 'esc_attr' )->alias(
+		self::stubCallback(
+			'esc_attr',
 			static fn ( mixed $value ): string => htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' )
 		);
-	}
-
-	/** Stops WordPress function mocks. */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		parent::tearDown();
 	}
 
 	/**

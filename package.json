@@ -7,13 +7,18 @@
     "node": ">=20.19"
   },
   "scripts": {
+    "init": "node scripts/init-plugin.mjs",
+    "postinstall": "node scripts/setup-php-tools.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"assets/src/**/*.css\" --allow-empty-input",
-    "lint": "npm run lint:js && npm run lint:css && composer lint:php",
-    "test:js": "vitest run --passWithNoTests",
-    "test": "npm run test:js && composer test:php",
+    "lint:php": "node scripts/run-php-tool.mjs phpcs --standard=phpcs.xml.dist",
+    "fix:php": "node scripts/run-php-tool.mjs phpcbf --standard=phpcs.xml.dist",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:php",
+    "test:js": "vitest run tests --passWithNoTests",
+    "test:php": "node scripts/run-php-tool.mjs phpunit --configuration phpunit.xml.dist",
+    "test": "npm run test:js && npm run test:php",
     "validate:build": "node scripts/validate-build.mjs",
     "package": "npm run lint && npm run test && npm run build && npm run validate:build && node scripts/build-zip.mjs",
     "rename": "node scripts/rename-plugin.mjs"
