@@ -172,6 +172,15 @@ Use a clean WordPress 6.5+ site with PHP 8.1+ and follow [the package smoke chec
 
 All visible PHP strings use the `fancyn-plugin-starter` text domain. Do not concatenate translated sentence fragments. JavaScript-facing strings should be passed through WordPress localization or script translations when new dynamic messages are introduced.
 
+Install the WordPress i18n command once, then regenerate the translation template after changing user-facing strings:
+
+```bash
+wp package install wp-cli/i18n-command
+wp i18n make-pot . languages/fancyn-plugin-starter.pot --domain=fancyn-plugin-starter --exclude=vendor,node_modules,assets/dist,build,.worktrees
+```
+
+Commit the generated POT file when preparing a translated release. Run the command again after renaming so the slug, text domain, and output filename match the renamed project.
+
 ## Security rules
 
 - Treat `$_POST`, `$_GET`, REST, and AJAX data as untrusted.

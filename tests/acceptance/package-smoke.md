@@ -3,12 +3,12 @@
 ## Automated release evidence
 
 - `npm run lint`: PASS on 2026-07-28; ESLint, Stylelint, and PHPCS exited 0 (61 PHP files checked).
-- `npm run test`: PASS on 2026-07-28; Vitest passed 43 tests in 9 files and PHPUnit passed 100 tests with 407 assertions.
-- `npm run build`: PASS on 2026-07-28; Vite built the manifest, 28.74 kB CSS, and 104.11 kB JavaScript bundles.
+- `npm run test`: PASS on 2026-07-28; Vitest passed 48 tests in 9 files and PHPUnit passed 102 tests with 410 assertions.
+- `npm run build`: PASS on 2026-07-28; Vite built the manifest, 28.89 kB CSS, and 104.11 kB JavaScript bundles.
 - `npm run validate:build`: PASS on 2026-07-28; both production entries and CSS isolation validated.
 - `npm run package`: PASS on 2026-07-28; repeated lint, tests, build, and validation before creating the ZIP.
 - `npm audit`: PASS on 2026-07-28; 0 vulnerabilities.
-- ZIP forbidden-file audit: PASS; 66 entries under one `fancyn-plugin-starter/` root, 0 forbidden paths, and no source maps.
+- ZIP forbidden-file audit: PASS; 81 files under one `fancyn-plugin-starter/` root, 0 forbidden paths, and no source maps.
 - ZIP runtime audit: PASS; main plugin file, README, Vite manifest, production Composer autoloader, and languages directory are present.
 - ZIP PHP syntax audit: PASS; `php -l` reported 0 failures across all 43 packaged PHP files.
 
@@ -31,16 +31,16 @@
 
 | Check | Result | Evidence |
 |---|---|---|
-| WordPress version | Pending | Live environment |
-| PHP version | Pending | Live environment |
-| ZIP SHA-256 | PASS | `00A88A42A6E8DCBAF07F71E031E66127D9C8CCD51FE785EA603DE6F9DC1CF4FD` |
-| Install and activate | Pending | Live environment |
-| Dashboard render | Pending | Live environment |
-| Settings save | Pending | Live environment |
-| Components showcase | Pending | Live environment |
-| Keyboard accessibility | Pending | Browser backend unavailable |
-| Responsive layouts | Pending | Browser backend unavailable |
-| CSS isolation on other admin pages | Pending | Browser backend unavailable |
-| REST/AJAX authorization | Pending | Live environment |
+| WordPress version | PASS | WordPress 7.0.2 on `plugin-dev.test` |
+| PHP version | PASS | PHP 8.3.25 |
+| ZIP SHA-256 | PASS | `49732B881ADBE8CAC566F130AC852693C18733D7C1FD972775D921CA3D8EE0F8` |
+| Install and activate | PASS | Final ZIP expanded to an isolated plugin directory and activated through `activate_plugin()` with no plugin warning or activation error |
+| Dashboard render | PASS | Browser returned the plugin root, production CSS/JS, module script tag, no PHP error text, and no console error |
+| Settings save | PASS | Browser submitted the Settings API form, displayed “Settings saved.”, and rendered the persisted value after redirect |
+| Components showcase | PASS | Dev mode exposed all component sections; Tom Select, color picker, media dialog, editor, modal, tabs, and dropdown initialized without console errors |
+| Keyboard accessibility | PASS | Modal moved focus to Close, closed with Escape, restored trigger focus; ArrowRight changed tab and panel; dropdown closed with Escape; focused input had a visible 2px ring |
+| Responsive layouts | PASS | Browser checks at 1440px, 768px, and 375px reported no horizontal document overflow; editor width remained within its parent |
+| CSS isolation on other admin pages | PASS | WordPress Dashboard loaded zero plugin styles/scripts and retained zero horizontal overflow |
+| REST/AJAX authorization | PASS | Authorized REST and AJAX returned success; logged-out REST returned 401; AJAX without nonce returned 403 |
 
 Do not mark this checklist complete from automated unit tests alone. Record direct live-site evidence for every row.
