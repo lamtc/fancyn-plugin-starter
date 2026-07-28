@@ -1,17 +1,19 @@
 # Fancyn Plugin Starter
 
-A standalone WordPress admin-plugin starter using PHP components, scoped Tailwind CSS, Vite, Alpine.js, Tom Select, and selected WordPress APIs. Each renamed project builds and packages independently; no runtime “core UI plugin” is required.
+[English version](README.en.md)
 
-## Requirements
+Bộ khởi tạo độc lập dành cho plugin quản trị WordPress, sử dụng các component PHP, Tailwind CSS được giới hạn phạm vi, Vite, Alpine.js, Tom Select và một số WordPress API. Mỗi dự án sau khi đổi tên có thể build và đóng gói độc lập; không cần “plugin UI lõi” khi chạy.
 
-- WordPress 6.5 or newer
-- PHP 8.1 or newer
-- Node.js 20.19 or newer
-- npm 10 or newer
+## Yêu cầu hệ thống
 
-Composer is unsupported and unnecessary. PHP remains a system runtime invoked by npm commands.
+- WordPress 6.5 trở lên
+- PHP 8.1 trở lên
+- Node.js 20.19 trở lên
+- npm 10 trở lên
 
-## Install for development
+Composer không được hỗ trợ và cũng không cần thiết. PHP vẫn là runtime hệ thống được gọi thông qua các lệnh npm.
+
+## Cài đặt để phát triển
 
 ```bash
 git clone <repository-url>
@@ -23,40 +25,40 @@ npm test
 npm run package
 ```
 
-Run `npm run init` before `npm install` to name the new plugin. The initializer uses only Node built-ins, so no downloaded JavaScript packages are required yet.
+Chạy `npm run init` trước `npm install` để đặt tên cho plugin mới. Trình khởi tạo chỉ sử dụng các module tích hợp sẵn của Node nên chưa cần tải package JavaScript nào ở bước này.
 
-The first `npm install` runs `postinstall` and downloads checksum-pinned PHPUnit, PHPCS, WordPress Coding Standards, and their standards dependencies into the ignored `tools/` cache. A later install reuses a valid cache, including offline. To force a refresh, remove the generated version directories beneath `tools/` but preserve the tracked `tools/php-tools.json` manifest, then run `npm install` again. The first setup requires HTTPS access to the pinned release URLs; if a proxy or firewall blocks a download, configure npm/system proxy access and retry. A checksum mismatch aborts setup without replacing a valid cached tool—never bypass it or calculate trust from the failed response.
+Lần chạy `npm install` đầu tiên sẽ thực thi `postinstall`, sau đó tải PHPUnit, PHPCS, WordPress Coding Standards và các standard phụ thuộc đã được khóa phiên bản và checksum vào cache `tools/` bị Git bỏ qua. Các lần cài đặt sau sẽ tái sử dụng cache hợp lệ, kể cả khi ngoại tuyến. Để buộc làm mới, hãy xóa các thư mục phiên bản được tạo bên dưới `tools/`, nhưng giữ lại manifest `tools/php-tools.json` đang được quản lý bởi Git, rồi chạy lại `npm install`. Lần thiết lập đầu tiên cần truy cập HTTPS đến các URL release đã khóa; nếu proxy hoặc tường lửa chặn tải xuống, hãy cấu hình proxy cho npm/hệ thống rồi thử lại. Nếu checksum không khớp, quá trình thiết lập sẽ dừng mà không thay thế tool hợp lệ trong cache—không được bỏ qua bước kiểm tra hoặc tin tưởng checksum tính từ response lỗi.
 
-Place the project in `wp-content/plugins`, activate **Fancyn Plugin Starter**, then open its Dashboard or Settings page.
+Đặt dự án trong `wp-content/plugins`, kích hoạt **Fancyn Plugin Starter**, rồi mở trang Dashboard hoặc Settings của plugin.
 
-To expose the component showcase during local development, define this before WordPress loads plugins:
+Để hiển thị trang showcase component khi phát triển cục bộ, hãy khai báo hằng số sau trước khi WordPress tải plugin:
 
 ```php
 define( 'FANCYN_PLUGIN_STARTER_DEV_MODE', true );
 ```
 
-The showcase appears at **Tools → Plugin UI Kit**. It is disabled by default.
+Showcase xuất hiện tại **Tools → Plugin UI Kit**. Mặc định trang này bị tắt.
 
-## Development assets
+## Asset phát triển
 
 ```bash
 npm run dev
 ```
 
-Vite listens at `http://127.0.0.1:5173`. On plugin-owned screens, PHP checks the Vite client and uses HMR source entries when available. If the server is unavailable, it falls back to `assets/dist/.vite/manifest.json`.
+Vite lắng nghe tại `http://127.0.0.1:5173`. Trên các màn hình thuộc plugin, PHP kiểm tra Vite client và dùng source entry HMR khi có thể. Nếu server không khả dụng, hệ thống chuyển sang `assets/dist/.vite/manifest.json`.
 
-Assets are never enqueued on unrelated WordPress admin pages. Tailwind uses the `fps-` prefix, disables Preflight, uses `@tailwindcss/forms` in class mode, and scopes final PostCSS output under `.fps-plugin-root`.
+Asset không bao giờ được enqueue trên các trang quản trị WordPress không liên quan. Tailwind sử dụng prefix `fps-`, tắt Preflight, dùng `@tailwindcss/forms` ở class mode và giới hạn toàn bộ output PostCSS cuối cùng bên dưới `.fps-plugin-root`.
 
-Create production assets with:
+Tạo asset production bằng:
 
 ```bash
 npm run build
 npm run validate:build
 ```
 
-Release builds are minified, hashed, include a Vite manifest, and contain no source maps.
+Bản build release được minify, đặt tên theo hash, có Vite manifest và không chứa source map.
 
-## Quality commands
+## Các lệnh kiểm tra chất lượng
 
 ```bash
 npm run lint
@@ -64,23 +66,23 @@ npm run test
 npm run build
 ```
 
-- PHP follows WordPress Coding Standards with documented namespaced filename exceptions.
-- The checksum-pinned PHPUnit PHAR and repository-owned WordPress shim cover PHP services and components.
-- Vitest covers JavaScript behavior and Node release scripts.
-- ESLint and Stylelint check authored JavaScript and CSS.
+- PHP tuân thủ WordPress Coding Standards, ngoại trừ các trường hợp tên file dùng namespace đã được ghi rõ.
+- PHPUnit PHAR được khóa bằng checksum và WordPress shim thuộc repository kiểm thử các service cùng component PHP.
+- Vitest kiểm thử hành vi JavaScript và các script release chạy bằng Node.
+- ESLint và Stylelint kiểm tra JavaScript cùng CSS do dự án viết.
 
-## Folder boundaries
+## Ranh giới thư mục
 
-- `includes/` contains namespaced PHP application code; keep bootstrapping in `Core`, admin orchestration in `Admin`, HTTP endpoints in `Http`, and markup-only controls in `UI`.
-- `templates/` contains plugin-owned page templates. Wrap plugin UI in `.fps-plugin-root`.
-- `assets/src/` contains authored JavaScript and CSS; `assets/dist/` is generated and must not be edited by hand.
-- `languages/` contains translation catalogs.
-- `scripts/` contains rename, validation, and packaging tooling; `tests/` mirrors PHP, JavaScript, script, and acceptance responsibilities.
-- `tools/`, `node_modules/`, `assets/dist/`, and `build/` are generated locally. Downloaded tools and development dependencies never enter the release ZIP.
+- `includes/` chứa mã ứng dụng PHP dùng namespace; giữ phần khởi động trong `Core`, điều phối quản trị trong `Admin`, endpoint HTTP trong `Http` và các control chỉ tạo markup trong `UI`.
+- `templates/` chứa template trang thuộc plugin. Bọc UI của plugin trong `.fps-plugin-root`.
+- `assets/src/` chứa JavaScript và CSS nguồn; `assets/dist/` được sinh tự động và không được chỉnh sửa thủ công.
+- `languages/` chứa catalog bản dịch.
+- `scripts/` chứa công cụ đổi tên, xác thực và đóng gói; `tests/` phản ánh các phạm vi trách nhiệm PHP, JavaScript, script và acceptance.
+- `tools/`, `node_modules/`, `assets/dist/` và `build/` được tạo cục bộ. Tool tải xuống và dependency phát triển không bao giờ được đưa vào ZIP release.
 
-## Component usage
+## Sử dụng component
 
-All eleven components expose `make(array $args): string` and `render(array $args): void`.
+Cả mười một component đều cung cấp `make(array $args): string` và `render(array $args): void`.
 
 ```php
 use Fancyn\PluginStarter\UI\Input;
@@ -97,7 +99,7 @@ Input::render(
 );
 ```
 
-Available components:
+Các component có sẵn:
 
 - Button
 - Input
@@ -111,39 +113,39 @@ Available components:
 - FormSection
 - ValidationMessage
 
-Components render and escape markup only. They do not read request data, save options, perform capability checks, or enqueue dependencies.
+Component chỉ render và escape markup. Chúng không đọc request data, lưu option, kiểm tra capability hoặc enqueue dependency.
 
-## Settings and WordPress APIs
+## Settings và WordPress API
 
-The Settings page demonstrates:
+Trang Settings minh họa:
 
-- Settings API registration and standard nonce handling
-- Field-specific sanitization
-- `manage_options` capability protection
+- Đăng ký Settings API và xử lý nonce tiêu chuẩn
+- Sanitize riêng theo từng field
+- Bảo vệ bằng capability `manage_options`
 - WordPress Color Picker
-- Media uploader storing attachment IDs
+- Media uploader lưu attachment ID
 - `wp_editor()`
-- Translated save notices
+- Thông báo lưu có hỗ trợ dịch
 
-The flow is `admin_init` registration, `register_setting()` with a sanitization callback, `settings_fields()` nonce output, `do_settings_sections()` field rendering, and `submit_button()` submission to `options.php`. WordPress performs the capability and nonce checks; the sanitizer validates each field before the option is persisted.
+Luồng xử lý gồm đăng ký tại `admin_init`, gọi `register_setting()` với callback sanitize, xuất nonce bằng `settings_fields()`, render field bằng `do_settings_sections()` và dùng `submit_button()` để gửi form đến `options.php`. WordPress thực hiện kiểm tra capability và nonce; sanitizer xác thực từng field trước khi option được lưu.
 
-WordPress media/editor/color dependencies load only on pages that use them.
+Dependency media/editor/color của WordPress chỉ được tải trên các trang thực sự sử dụng chúng.
 
-REST and AJAX examples are authenticated and require `manage_options`. The REST route declares a schema and permission callback. AJAX validates its nonce before sanitizing input. No public `nopriv` action is registered.
+Các ví dụ REST và AJAX đều yêu cầu xác thực cùng capability `manage_options`. REST route khai báo schema và permission callback. AJAX xác thực nonce trước khi sanitize input. Không đăng ký action `nopriv` công khai.
 
-## Initialize the starter
+## Khởi tạo Starter Kit
 
-Run the interactive initializer before installing dependencies:
+Chạy trình khởi tạo tương tác trước khi cài dependency:
 
 ```bash
 npm run init
 ```
 
-It asks, in order, for plugin name, plugin slug, PHP namespace, PHP prefix, and CSS prefix. It derives the text domain, option prefix, REST namespace, and main PHP filename, displays the complete JSON configuration, then requires an explicit `yes` confirmation. Answering anything else cancels with no file changes.
+Trình khởi tạo lần lượt hỏi tên plugin, plugin slug, PHP namespace, PHP prefix và CSS prefix. Từ đó, công cụ suy ra text domain, option prefix, REST namespace và tên file PHP chính; hiển thị cấu hình JSON đầy đủ rồi yêu cầu xác nhận rõ ràng bằng `yes`. Câu trả lời khác sẽ hủy thao tác mà không thay đổi file.
 
-Validation requires a lowercase hyphenated slug, at least two valid PHP namespace segments, a lowercase snake-case PHP prefix ending in `_`, and a lowercase CSS prefix ending in `-`. Running again with identical metadata is safe; different metadata is rejected after initialization.
+Quy tắc xác thực yêu cầu slug viết thường và phân tách bằng dấu gạch ngang; PHP namespace có ít nhất hai segment hợp lệ; PHP prefix dùng snake case chữ thường và kết thúc bằng `_`; CSS prefix viết thường và kết thúc bằng `-`. Chạy lại với metadata giống hệt là an toàn; metadata khác sẽ bị từ chối sau khi dự án đã khởi tạo.
 
-For automation, create a metadata file outside the project, for example `new-plugin.json`:
+Để tự động hóa, hãy tạo một file metadata bên ngoài dự án, ví dụ `new-plugin.json`:
 
 ```json
 {
@@ -158,61 +160,61 @@ For automation, create a metadata file outside the project, for example `new-plu
 }
 ```
 
-Run:
+Chạy:
 
 ```bash
 npm run rename -- --config ../new-plugin.json
 ```
 
-The JSON rename mode uses the same validation and staged engine as interactive initialization.
+Chế độ đổi tên bằng JSON sử dụng cùng quy tắc xác thực và rename engine theo giai đoạn như trình khởi tạo tương tác.
 
-For version 1.0, the text domain must equal the plugin slug and the option prefix must equal the PHP prefix.
+Trong phiên bản 1.0, text domain phải trùng với plugin slug và option prefix phải trùng với PHP prefix.
 
-## Package a release
+## Đóng gói bản phát hành
 
 ```bash
 npm run package
 ```
 
-The command runs lint, all tests, the production build, build validation, and Composer-free ZIP creation. Output:
+Lệnh này chạy lint, toàn bộ test, production build, xác thực build và tạo ZIP không dùng Composer. Kết quả:
 
 ```text
 build/fancyn-plugin-starter.zip
 ```
 
-`.distignore` is the exclusion source. The ZIP contains compiled assets, the project-owned PHP autoloader, runtime classes, templates, languages, and README. It excludes source assets, tests, scripts, development configuration, `node_modules/`, `tools/`, `vendor/`, Composer manifests, source maps, and repository files.
+`.distignore` là nguồn quy tắc loại trừ. ZIP chứa asset đã biên dịch, PHP autoloader thuộc dự án, runtime class, template, ngôn ngữ và README. ZIP loại bỏ source asset, test, script, cấu hình phát triển, `node_modules/`, `tools/`, `vendor/`, Composer manifest, source map và file repository.
 
-The ZIP requires only the supported WordPress/PHP runtime after installation.
+Sau khi cài đặt, ZIP chỉ yêu cầu runtime WordPress/PHP được hỗ trợ.
 
-## Clean-site verification
+## Kiểm chứng trên website sạch
 
-Use a clean WordPress 6.5+ site with PHP 8.1+ and follow [the package smoke checklist](tests/acceptance/package-smoke.md). Install the generated ZIP through **Plugins → Add New Plugin → Upload Plugin**, activate it, explicitly enable dev mode, visit every plugin and showcase page, save settings, exercise the WordPress integrations and authorized/unauthorized HTTP paths, then disable dev mode and verify the showcase disappears. Automated tests do not replace the responsive and keyboard-only browser checks.
+Sử dụng website WordPress 6.5+ sạch với PHP 8.1+ và làm theo [checklist smoke test gói phát hành](tests/acceptance/package-smoke.md). Cài ZIP được tạo thông qua **Plugins → Add New Plugin → Upload Plugin**, kích hoạt plugin, bật dev mode rõ ràng, truy cập mọi trang plugin và showcase, lưu settings, kiểm tra các tích hợp WordPress cùng đường dẫn HTTP được phép/không được phép, sau đó tắt dev mode và xác nhận showcase biến mất. Test tự động không thay thế cho kiểm tra responsive và thao tác chỉ bằng bàn phím trên trình duyệt.
 
-## Internationalization
+## Quốc tế hóa
 
-All visible PHP strings use the `fancyn-plugin-starter` text domain. Do not concatenate translated sentence fragments. JavaScript-facing strings should be passed through WordPress localization or script translations when new dynamic messages are introduced.
+Mọi chuỗi PHP hiển thị đều dùng text domain `fancyn-plugin-starter`. Không nối các đoạn câu đã dịch. Khi bổ sung message động mới, chuỗi dành cho JavaScript nên được truyền qua cơ chế localization hoặc script translation của WordPress.
 
-Install the WordPress i18n command once, then regenerate the translation template after changing user-facing strings:
+Cài lệnh i18n của WordPress một lần, sau đó tạo lại translation template khi thay đổi chuỗi hiển thị:
 
 ```bash
 wp package install wp-cli/i18n-command
 wp i18n make-pot . languages/fancyn-plugin-starter.pot --domain=fancyn-plugin-starter --exclude=node_modules,tools,assets/dist,build,.worktrees
 ```
 
-Commit the generated POT file when preparing a translated release. Run the command again after renaming so the slug, text domain, and output filename match the renamed project.
+Commit file POT được tạo khi chuẩn bị release có bản dịch. Chạy lại lệnh sau khi đổi tên để slug, text domain và tên file output khớp với dự án đã đổi tên.
 
-## Security rules
+## Quy tắc bảo mật
 
-- Treat `$_POST`, `$_GET`, REST, and AJAX data as untrusted.
-- Sanitize by field type and validate before saving.
-- Escape output by HTML context.
-- Require a nonce for every custom mutation.
-- Prefer capabilities over role names.
-- Every REST route requires an explicit permission callback.
-- Global functions and constants require the project prefix.
+- Xem dữ liệu `$_POST`, `$_GET`, REST và AJAX là không đáng tin cậy.
+- Sanitize theo loại field và xác thực trước khi lưu.
+- Escape output theo đúng ngữ cảnh HTML.
+- Yêu cầu nonce cho mọi thao tác thay đổi dữ liệu tùy chỉnh.
+- Ưu tiên capability thay vì tên role.
+- Mọi REST route phải có permission callback rõ ràng.
+- Hàm và hằng số global phải dùng prefix của dự án.
 
-## Version 1.0 boundaries
+## Phạm vi phiên bản 1.0
 
-Not included: React, shadcn/ui, public frontend components, dark mode, remote-select adapters, advanced data tables, date-range pickers, complete toast infrastructure, or a drag-and-drop form builder.
+Không bao gồm: React, shadcn/ui, component frontend công khai, dark mode, adapter select từ xa, data table nâng cao, date-range picker, hạ tầng toast đầy đủ hoặc trình tạo form kéo thả.
 
-See `docs/WORDPRESS-PLUGIN-STARTER-SPEC.md` and `docs/DESIGN-RULES.md` for the authoritative product and visual requirements.
+Xem `docs/WORDPRESS-PLUGIN-STARTER-SPEC.md` và `docs/DESIGN-RULES.md` để tham khảo các yêu cầu sản phẩm và hình ảnh có tính chuẩn tắc.
