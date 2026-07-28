@@ -12,7 +12,7 @@ async function fixture() {
   await mkdir(path.join(root, 'assets', 'dist', '.vite'), { recursive: true });
   await mkdir(path.join(root, 'assets', 'dist', 'assets'), { recursive: true });
   await writeFile(path.join(root, 'assets', 'dist', 'assets', 'admin.js'), 'export{}');
-  await writeFile(path.join(root, 'assets', 'dist', 'assets', 'admin.css'), '.fps-plugin-root{color:red}');
+  await writeFile(path.join(root, 'assets', 'dist', 'assets', 'admin.css'), '.fps-plugin-root .fps-button{color:red}');
   await writeFile(path.join(root, 'assets', 'dist', '.vite', 'manifest.json'), JSON.stringify({
     'assets/src/js/admin.js': { file: 'assets/admin.js', isEntry: true },
     'assets/src/css/admin.css': { file: 'assets/admin.css', isEntry: true },

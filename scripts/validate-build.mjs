@@ -1,6 +1,7 @@
 import { access, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import postcss from 'postcss';
 
 async function findMaps(directory) {
   const maps = [];
@@ -10,6 +11,31 @@ async function findMaps(directory) {
     else if (entry.isFile() && entry.name.endsWith('.map')) maps.push(target);
   }
   return maps;
+}
+
+export function validateCssIsolation(css) {
+  const failures = [];
+  let hasPrefixedUtility = false;
+
+  if (/sourceMappingURL\s*=/i.test(css)) {
+    failures.push('Release CSS contains a source map reference');
+  }
+
+  postcss.parse(css).walkRules((rule) => {
+    let parent = rule.parent;
+    while (parent) {
+      if (parent.type === 'atrule' && /keyframes$/i.test(parent.name)) return;
+      parent = parent.parent;
+    }
+    for (const selector of rule.selectors ?? []) {
+      const normalized = selector.trim();
+      if (!normalized.startsWith('.fps-plugin-root')) failures.push(`Unscoped CSS selector found: ${normalized}`);
+      if (/\.fps-(?!plugin-root\b)[\w\\-]+/.test(normalized)) hasPrefixedUtility = true;
+    }
+  });
+  if (!hasPrefixedUtility) failures.push('Release CSS contains no fps- utility selectors');
+  if (failures.length) throw new Error([...new Set(failures)].join('\n'));
+  return true;
 }
 
 export async function validateBuild(root = process.cwd()) {
@@ -32,6 +58,16 @@ export async function validateBuild(root = process.cwd()) {
       continue;
     }
     await access(path.join(distribution, file)).catch(() => failures.push(`Missing referenced file: ${file}`));
+    if (source.endsWith('.css') && typeof file === 'string') {
+      const css = await readFile(path.join(distribution, file), 'utf8').catch(() => '');
+      if (css) {
+        try {
+          validateCssIsolation(css);
+        } catch (error) {
+          failures.push(error.message);
+        }
+      }
+    }
   }
   const maps = await findMaps(distribution);
   if (maps.length) failures.push(`Release source map found: ${maps.map((file) => path.relative(projectRoot, file)).join(', ')}`);
