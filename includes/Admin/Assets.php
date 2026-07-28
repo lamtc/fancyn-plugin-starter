@@ -120,7 +120,7 @@ final class Assets implements ServiceProvider {
 		if ( '' === $screen_id || ! str_contains( $screen_id, 'fancyn-plugin-starter' ) ) {
 			return;
 		}
-		if ( str_ends_with( $hook_suffix, '-settings' ) ) {
+		if ( $this->uses_wordpress_integrations( $hook_suffix ) ) {
 			wp_enqueue_media();
 			wp_enqueue_editor();
 		}
@@ -212,7 +212,7 @@ final class Assets implements ServiceProvider {
 	 * @return array{scripts: array<int, string>, styles: array<int, string>}
 	 */
 	private function dependencies_for( string $hook_suffix ): array {
-		if ( str_ends_with( $hook_suffix, '-settings' ) ) {
+		if ( $this->uses_wordpress_integrations( $hook_suffix ) ) {
 			return array(
 				'scripts' => array( 'wp-color-picker', 'wp-editor', 'media-editor', 'wp-api-fetch' ),
 				'styles'  => array( 'wp-color-picker' ),
@@ -223,6 +223,16 @@ final class Assets implements ServiceProvider {
 			'scripts' => array(),
 			'styles'  => array(),
 		);
+	}
+
+	/**
+	 * Determines whether a page demonstrates WordPress UI APIs.
+	 *
+	 * @param string $hook_suffix Current admin page hook suffix.
+	 */
+	private function uses_wordpress_integrations( string $hook_suffix ): bool {
+		return str_ends_with( $hook_suffix, '-settings' )
+			|| str_ends_with( $hook_suffix, '-components' );
 	}
 
 	/**

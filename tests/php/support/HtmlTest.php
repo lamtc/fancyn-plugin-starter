@@ -75,6 +75,23 @@ final class HtmlTest extends TestCase {
 	}
 
 	/**
+	 * Allows the explicit Alpine attribute contract without allowing native handlers.
+	 */
+	public function test_attributes_allows_explicit_alpine_attributes(): void {
+		$html = Html::attributes(
+			array(
+				'@click'         => 'toggle()',
+				':aria-expanded' => 'isOpen',
+				'onmouseover'    => 'bad',
+			)
+		);
+
+		$this->assertStringContainsString( '@click="toggle()"', $html );
+		$this->assertStringContainsString( ':aria-expanded="isOpen"', $html );
+		$this->assertStringNotContainsString( 'onmouseover', $html );
+	}
+
+	/**
 	 * Creates a deterministic class list from nested values.
 	 */
 	public function test_class_names_flattens_and_deduplicates_values(): void {

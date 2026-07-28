@@ -72,6 +72,25 @@ final class Html {
 	);
 
 	/**
+	 * Alpine attributes accepted from trusted component definitions.
+	 *
+	 * @var array<int, string>
+	 */
+	private const ALPINE_ATTRIBUTES = array(
+		'@click',
+		'@click.outside',
+		'@keydown',
+		'@keydown.window',
+		':aria-expanded',
+		':aria-selected',
+		':tabindex',
+		'x-cloak',
+		'x-data',
+		'x-ref',
+		'x-show',
+	);
+
+	/**
 	 * Converts a map into a leading-space-prefixed HTML attribute string.
 	 *
 	 * @param array<string, mixed> $attributes Attribute values.
@@ -164,6 +183,7 @@ final class Html {
 		}
 
 		return in_array( $name, self::ATTRIBUTES, true )
+			|| in_array( $name, self::ALPINE_ATTRIBUTES, true )
 			|| 1 === preg_match( '/^(?:aria|data)-[a-z0-9_-]+$/', $name );
 	}
 
