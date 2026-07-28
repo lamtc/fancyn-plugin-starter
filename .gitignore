@@ -9,6 +9,7 @@
 /build/
 /coverage/
 /artifacts/
+/.phpunit.cache/
 
 # Local environment files.
 .env
