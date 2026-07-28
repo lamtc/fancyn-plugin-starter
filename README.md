@@ -25,7 +25,7 @@ npm run package
 
 Run `npm run init` before `npm install` to name the new plugin. The initializer uses only Node built-ins, so no downloaded JavaScript packages are required yet.
 
-The first `npm install` runs `postinstall` and downloads checksum-pinned PHPUnit, PHPCS, WordPress Coding Standards, and their standards dependencies into the ignored `tools/` cache. A later install reuses a valid cache, including offline. Delete `tools/` to force a refresh. The first setup requires HTTPS access to the pinned release URLs; if a proxy or firewall blocks a download, configure npm/system proxy access and retry. A checksum mismatch aborts setup without replacing a valid cached tool—never bypass it or calculate trust from the failed response.
+The first `npm install` runs `postinstall` and downloads checksum-pinned PHPUnit, PHPCS, WordPress Coding Standards, and their standards dependencies into the ignored `tools/` cache. A later install reuses a valid cache, including offline. To force a refresh, remove the generated version directories beneath `tools/` but preserve the tracked `tools/php-tools.json` manifest, then run `npm install` again. The first setup requires HTTPS access to the pinned release URLs; if a proxy or firewall blocks a download, configure npm/system proxy access and retry. A checksum mismatch aborts setup without replacing a valid cached tool—never bypass it or calculate trust from the failed response.
 
 Place the project in `wp-content/plugins`, activate **Fancyn Plugin Starter**, then open its Dashboard or Settings page.
 
