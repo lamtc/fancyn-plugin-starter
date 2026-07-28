@@ -7,6 +7,7 @@
     "node": ">=20.19"
   },
   "scripts": {
+    "init": "node scripts/init-plugin.mjs",
     "postinstall": "node scripts/setup-php-tools.mjs",
     "dev": "vite",
     "build": "vite build",
