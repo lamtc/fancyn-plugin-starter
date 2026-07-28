@@ -5,4 +5,40 @@
     font-size: 14px;
     line-height: 1.6;
   }
+
+  .fps-plugin-root .ts-wrapper {
+    font-size: 14px;
+  }
+
+  .fps-plugin-root .ts-control {
+    min-height: 44px;
+    border-color: #e2e2df;
+    border-radius: 10px;
+    box-shadow: none;
+    padding: 9px 12px;
+  }
+
+  .fps-plugin-root .ts-wrapper.focus .ts-control {
+    border-color: #f4511e;
+    box-shadow: 0 0 0 3px #fff0ea;
+  }
+
+  .fps-plugin-root .ts-dropdown {
+    border-color: #e2e2df;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgb(0 0 0 / 10%);
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .fps-plugin-root .ts-dropdown .active {
+    background: #f8f8f7;
+    color: #171717;
+  }
+
+  .fps-plugin-root .ts-wrapper.multi .ts-control > div {
+    background: #fff0ea;
+    border-radius: 8px;
+    color: #5f5f5b;
+  }
 }
