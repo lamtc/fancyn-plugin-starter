@@ -14,7 +14,18 @@
 
 ## Clean WordPress procedure
 
-Before the live checks, create a clean clone with no `node_modules/`, `tools/`, `vendor/`, build output, or Composer executable on `PATH`. Run `npm run init`, `npm install`, `npm run lint`, `npm test`, and `npm run package` on Windows and a Unix-like environment. Audit the renamed ZIP for one slug root, the internal autoloader, valid PHP syntax, and absence of Composer/vendor/tools/development files; record versions and SHA-256 below.
+Before the live checks, create a clean clone with no `node_modules/`, downloaded tool cache beneath `tools/`, `vendor/`, build output, or Composer executable on `PATH`. Run `npm run init`, `npm install`, `npm run lint`, `npm test`, and `npm run package` on Windows and a Unix-like environment. Audit the renamed ZIP for one slug root, the internal autoloader, valid PHP syntax, and absence of Composer/vendor/tools/development files; record versions and SHA-256 below.
+
+## npm-only clean-clone evidence (2026-07-28)
+
+- Windows 11 / Node 22.22.3 / npm 10.8.2 / PHP 8.3.25: PASS with a restricted `PATH` where `composer-present=False`.
+- Clean state: PASS; no `node_modules/`, `vendor/`, `assets/dist/`, or `build/`; `tools/` contained only tracked `php-tools.json` before install.
+- Piped `npm run init`: PASS for Example Deployment Plugin (`example-deployment-plugin`, `Example\DeploymentPlugin`, `example_deployment_plugin_`, `edp-`) before `npm install`.
+- Windows workflow: PASS; `npm install`, `npm run lint`, `npm test`, and `npm run package` all exited 0 without Composer. Result: 86 Vitest tests and 109 PHPUnit tests / 466 assertions.
+- Linux 6.6.87.2 (Docker/WSL2) / Node 22.23.1 / npm 10.9.8 / PHP 8.2.32: PASS with `composer-present=false`; the same clean init/install/lint/test/package workflow exited 0.
+- Windows renamed ZIP SHA-256: `091D5EC9E6AC0EEE6A0D2EF97EC2F074401A7321E26436A274B2CE66164E0F26`.
+- Linux renamed ZIP SHA-256: `E089C7CD32C8065D2182B08A0B6793F0647BAEF89D408CB25B4F00F351494E8A`.
+- Renamed ZIP audit: PASS; 52 entries under one `example-deployment-plugin/` root, internal autoloader present, 34 PHP files passed `php -l`, and zero Composer manifests, `vendor/`, `tools/`, tests, scripts, source assets, source maps, or Node dependencies.
 
 1. Generate the ZIP with `npm run package` and record its SHA-256 with `Get-FileHash build/fancyn-plugin-starter.zip -Algorithm SHA256`.
 2. Start a clean WordPress 6.5+ site running PHP 8.1+ with no copy of this plugin installed.
