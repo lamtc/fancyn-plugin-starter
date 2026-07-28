@@ -1,7 +1,6 @@
 .worktrees/
 
 # PHP and JavaScript dependencies.
-/vendor/
 /node_modules/
 /tools/*/
 /tools/.staging/

@@ -1,13 +1,11 @@
 import { ZipArchive } from 'archiver';
-import { execFile } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
-import { cp, mkdir, readFile, rm, unlink } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import createIgnore from 'ignore';
 
-const execute = promisify(execFile);
+const FORBIDDEN_PATHS = new Set(['composer.json', 'composer.lock', 'vendor', 'tools']);
 
 async function archiveDirectory(stage, slug, zipPath) {
   await new Promise((resolve, reject) => {
@@ -36,7 +34,8 @@ export async function buildZip({ root = process.cwd(), outputDirectory } = {}) {
   const ignored = (relative) => {
     if (!relative) return false;
     const normalized = relative.split(path.sep).join('/');
-    if (['composer.json', 'composer.lock'].includes(normalized)) return false;
+    const topLevel = normalized.split('/')[0];
+    if (FORBIDDEN_PATHS.has(topLevel)) return true;
     return matcher.ignores(normalized) || matcher.ignores(`${normalized}/`);
   };
 
@@ -49,14 +48,10 @@ export async function buildZip({ root = process.cwd(), outputDirectory } = {}) {
         return !ignored(path.relative(projectRoot, source));
       },
     });
-    await execute('composer', ['install', '--no-dev', '--optimize-autoloader', '--no-interaction'], {
-      cwd: stage,
-      shell: process.platform === 'win32',
-      windowsHide: true,
-    });
-    for (const file of ['composer.json', 'composer.lock']) {
-      if (matcher.ignores(file)) await unlink(path.join(stage, file)).catch(() => {});
-    }
+    const stageEntries = await readdir(stage);
+    const forbidden = stageEntries.find((entry) => FORBIDDEN_PATHS.has(entry));
+    if (forbidden) throw new Error(`npm-only package staging contains forbidden path: ${forbidden}`);
+    await readFile(path.join(stage, 'includes', 'Autoloader.php'));
     await mkdir(outputRoot, { recursive: true });
     await rm(zipPath, { force: true });
     await archiveDirectory(stage, slug, zipPath);

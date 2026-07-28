@@ -15,10 +15,16 @@ async function fixture() {
   await mkdir(path.join(root, 'includes'), { recursive: true });
   await mkdir(path.join(root, 'scripts'), { recursive: true });
   await mkdir(path.join(root, 'tests'), { recursive: true });
+  await mkdir(path.join(root, 'vendor'), { recursive: true });
+  await mkdir(path.join(root, 'tools', 'phpunit', '10.5.64'), { recursive: true });
   await writeFile(path.join(root, 'plugin.json'), JSON.stringify({ pluginSlug: 'example-plugin' }));
   await writeFile(path.join(root, 'composer.json'), JSON.stringify({ name: 'example/plugin', autoload: { 'psr-4': { 'Example\\': 'includes/' } } }));
+  await writeFile(path.join(root, 'composer.lock'), '{}');
   await writeFile(path.join(root, 'example-plugin.php'), '<?php');
   await writeFile(path.join(root, 'includes', 'Plugin.php'), '<?php namespace Example; class Plugin {}');
+  await writeFile(path.join(root, 'includes', 'Autoloader.php'), '<?php namespace Example; class Autoloader {}');
+  await writeFile(path.join(root, 'vendor', 'autoload.php'), '<?php');
+  await writeFile(path.join(root, 'tools', 'phpunit', '10.5.64', 'phpunit.phar'), 'tool');
   await writeFile(path.join(root, 'assets', 'dist', 'admin.js'), 'export{}');
   await writeFile(path.join(root, 'assets', 'src', 'admin.js'), 'source');
   await writeFile(path.join(root, 'scripts', 'build.mjs'), 'source');
@@ -31,13 +37,16 @@ async function fixture() {
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true }))));
 
 describe('buildZip', () => {
-  it('packages runtime files and Composer production autoload only', async () => {
+  it('packages runtime files without Composer, vendor, or local tools', async () => {
     const root = await fixture();
     const zipPath = await buildZip({ root, outputDirectory: path.join(root, 'output') });
     const entries = new AdmZip(zipPath).getEntries().map((entry) => entry.entryName.replaceAll('\\', '/'));
     expect(entries).toContain('example-plugin/example-plugin.php');
     expect(entries).toContain('example-plugin/assets/dist/admin.js');
-    expect(entries).toContain('example-plugin/vendor/autoload.php');
+    expect(entries).toContain('example-plugin/includes/Autoloader.php');
+    expect(entries.some((entry) => entry.includes('/vendor/'))).toBe(false);
+    expect(entries.some((entry) => entry.includes('/tools/'))).toBe(false);
+    expect(entries.some((entry) => /\/composer\.(?:json|lock)$/.test(entry))).toBe(false);
     expect(entries.some((entry) => entry.includes('/tests/'))).toBe(false);
     expect(entries.some((entry) => entry.includes('/scripts/'))).toBe(false);
     expect(entries.some((entry) => entry.includes('/assets/src/'))).toBe(false);
